@@ -13,6 +13,7 @@ namespace Association
 			string[] lignes = File.ReadAllLines(filename);
 
 			Graphe<string> association = new Graphe<string>(false); // non orienté car associations réciproques
+			// non pondéré également
 			for (int i = 24; i <= 101; i++)
 			{
 				string[] ligne = lignes[i].Split(' ');
