@@ -8,14 +8,14 @@ namespace Association
 
         static void Main(string[] args)
         {
-            Graphe association = Graphique.LireFichier();
+            Graphe<string> association = Graphique.LireFichier();
             Console.WriteLine("Liste d'adjacence : ");
             association.AfficherListeAdjacence();
 
             Console.Write("\nPour les parcours, rentrer un sommet (entre 1 et 34) : ");
             string res = Console.ReadLine();
-            Noeud s = new Noeud("");
-            foreach (Noeud som in association.Noeuds) { if (som.Nom == res) { s = som; } }
+            Noeud<string> s = new Noeud<string>("");
+            foreach (Noeud<string> som in association.Noeuds) { if (som.Nom == res) { s = som; } }
 
             Console.WriteLine("\nParcours en largeur à partir du sommet " + s.Nom);
             association.ParcoursEnLargeur(s);

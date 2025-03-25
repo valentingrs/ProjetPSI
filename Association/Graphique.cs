@@ -5,40 +5,38 @@ namespace Association
 {
 	internal class Graphique
 	{
-
-
-		static public Graphe LireFichier()
+		static public Graphe<string> LireFichier()
 		{
 
 			string filename = ("soc-karate.mtx");
 			List<string> dico = new List<string>();
 			string[] lignes = File.ReadAllLines(filename);
 
-			Graphe association = new Graphe(false); // non orienté car associations réciproques
+			Graphe<string> association = new Graphe<string>(false); // non orienté car associations réciproques
 			for (int i = 24; i <= 101; i++)
 			{
 				string[] ligne = lignes[i].Split(' ');
 
 				string s0 = ligne[0];
-				Noeud noeud0 = new Noeud("");
+				Noeud<string> noeud0 = new Noeud<string>("");
 				bool existeDeja = false;
-				foreach (Noeud k in association.Noeuds)
+				foreach (Noeud<string> k in association.Noeuds)
 				{
 					if (k.Nom == s0) { noeud0 = k; existeDeja = true; }
 
 				}
-				if (existeDeja == false) { noeud0 = new Noeud(s0); }
+				if (existeDeja == false) { noeud0 = new Noeud<string>(s0); }
 
 				existeDeja = false;
 				string s1 = ligne[1];
-				Noeud noeud1 = new Noeud("");
-				foreach (Noeud j in association.Noeuds)
+				Noeud<string> noeud1 = new Noeud<string>("");
+				foreach (Noeud<string> j in association.Noeuds)
 				{
 					if (j.Nom == s1) { noeud1 = j; existeDeja = true; }
 				}
-				if (existeDeja == false) { noeud1 = new Noeud(s1); }
+				if (existeDeja == false) { noeud1 = new Noeud<string>(s1); }
 
-				Lien l = new Lien(noeud0, noeud1);
+				Lien<string> l = new Lien<string>(noeud0, noeud1);
 
 				if (!association.ContientSommet(noeud0)) { association.AjouterSommet(noeud0); }
 				if (!association.ContientSommet(noeud1)) { association.AjouterSommet(noeud1); }
@@ -50,7 +48,7 @@ namespace Association
 
 		}
 
-		static public void DessinerGraphe(Graphe graphe, string fichierImage)
+		static public void DessinerGraphe(Graphe<string> graphe, string fichierImage)
 		{
 			const int largeurImage = 900;
 			const int hauteurImage = 800;
@@ -87,14 +85,14 @@ namespace Association
 				};
 
 				// Position des sommets (un exemple simple)
-				Dictionary<Noeud, SKPoint> positions = new Dictionary<Noeud, SKPoint>();
+				Dictionary<Noeud<string>, SKPoint> positions = new Dictionary<Noeud<string>, SKPoint>();
 				int angleStep = 360 / graphe.Noeuds.Count;
 				int rayon = 350;
 				SKPoint centre = new SKPoint(largeurImage / 2, hauteurImage / 2);
 				int angle = 0;
 
 				// Calculer les positions des sommets en cercle
-				foreach (Noeud noeud in graphe.Noeuds)
+				foreach (Noeud<string> noeud in graphe.Noeuds)
 				{
 					float x = centre.X + rayon * (float)Math.Cos(Math.PI * angle / 180);
 					float y = centre.Y + rayon * (float)Math.Sin(Math.PI * angle / 180);
@@ -103,7 +101,7 @@ namespace Association
 				}
 
 				// Dessiner les liens entre les sommets
-				foreach (Lien lien in graphe.Liens)
+				foreach (Lien<string> lien in graphe.Liens)
 				{
 					// Vérifier si les sommets existent dans le dictionnaire avant de dessiner
 					if (positions.ContainsKey(lien.Noeud1) && positions.ContainsKey(lien.Noeud2))
@@ -115,7 +113,7 @@ namespace Association
 				}
 
 				// Dessiner les sommets
-				foreach (KeyValuePair<Noeud, SKPoint> entry in positions)
+				foreach (KeyValuePair<Noeud<string>, SKPoint> entry in positions)
 				{
 					SKPoint position = entry.Value;
 					canvas.DrawCircle(position, 20, sommetPaint);  // Dessiner le sommet comme un cercle
