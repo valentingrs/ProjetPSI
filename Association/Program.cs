@@ -1,230 +1,171 @@
-﻿using System.Reflection.Metadata.Ecma335;
+﻿using System.Collections.Generic;
+using System;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 using static Association.Program;
+using static System.Net.Mime.MediaTypeNames;
+using SkiaSharp;
+using System.Collections.Generic;
+using System.IO;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Net.Sockets;
+
 
 namespace Association
 {
     internal class Program
     {
-        public class Sommet
+
+
+        static public Graphe LireFichier()
         {
-            private string nom;
-            private bool marque;
-            private List<Sommet> voisins;
 
-            public Sommet(string nom)
+            string filename = ("soc-karate.mtx");
+            List<string> dico = new List<string>();
+            string[] lignes = File.ReadAllLines(filename);
+
+            Graphe association = new Graphe(false); // non orienté car associations réciproques
+            for (int i = 24; i <= 101; i++)
             {
-                voisins = new List<Sommet>();
-                this.nom = nom;
-            }
+                string[] ligne = lignes[i].Split(' ');
 
-            public string Nom
-            {
-                get { return nom; }
-            }
-
-
-            public void ajouterVoisin(Sommet s)
-            {
-                voisins.Add(s);
-            }
-
-            public void Marquer()
-            {
-                marque = true;
-            }
-
-            public string AfficherSommet()
-            {
-                string s = nom + " - { ";
-                for (int i = 0; i < voisins.Count - 1; i++)
+                string s0 = ligne[0];
+                Sommet sommet0 = new Sommet("");
+                bool existeDeja = false;
+                foreach (Sommet k in association.Sommets)
                 {
-                    nom = nom + voisins[i] + ", ";
+                    if (k.Nom == s0) { sommet0 = k; existeDeja = true; } 
+
                 }
-                int j = voisins.Count - 1;
-                nom = nom + voisins[j];
-                return s;
+                if (existeDeja == false) { sommet0 = new Sommet(s0); }
+
+                existeDeja = false;
+                string s1 = ligne[1];
+                Sommet sommet1 = new Sommet("");
+                foreach (Sommet j in association.Sommets)
+                {
+                    if (j.Nom == s1) { sommet1 = j; existeDeja = true;  } 
+                }
+                if (existeDeja == false) { sommet1 = new Sommet(s1); }
+
+                Lien l = new Lien(sommet0, sommet1);
+
+                if (!association.ContientSommet(sommet0)) { association.AjouterSommet(sommet0); }
+                if (!association.ContientSommet(sommet1)) { association.AjouterSommet(sommet1); }
+                
+                association.AjouterLien(l);
+        
             }
-
-            public override string ToString()
-            {
-                return nom;
-            }
-
-            public int Degre()
-            {
-                return voisins.Count();
-            }
-
-
-        }
-
-        public class Lien
-        {
-            private Sommet sommet1;
-            private Sommet sommet2;
-            //private int poids;
-
-            public Lien(Sommet sommet1, Sommet sommet2) //int poids
-            {
-                this.sommet1 = sommet1;
-                this.sommet2 = sommet2;
-                sommet1.ajouterVoisin(sommet2);
-                sommet2.ajouterVoisin(sommet1);
-                //this.poids =poids;
-            }
-
-            public Sommet Sommet1
-            {
-                get { return sommet1; }
-            }
-
-            public Sommet Sommet2
-            {
-                get { return sommet2; }
-            }
+            return association;
             
-            public override string ToString()
-            {
-                string s = sommet1.Nom + " - " + sommet2.Nom;
-                return s;
-            }
         }
 
-        public class Graphe
+        static void DessinerGraphe(Graphe graphe, string fichierImage)
         {
-            private List<Sommet> sommets;
-            private List<Lien> liens;
-            private bool oriente;
+            const int largeurImage = 900;
+            const int hauteurImage = 800;
 
-            public Graphe(bool oriente)
+            // Création du bitmap pour l'image
+            using (var bitmap = new SKBitmap(largeurImage, hauteurImage))
+            using (var canvas = new SKCanvas(bitmap))
             {
-                sommets = new List<Sommet>();
-                liens = new List<Lien>();
-                this.oriente = oriente;
-            }
+                // Remplir le fond en blanc
+                canvas.Clear(SKColors.White);
 
-            public bool Oriente
-            {
-                get { return oriente; }
-                set { oriente = value; }
-            }
-
-            public void AjouterSommet(Sommet sommet)
-            {
-                sommets.Add(sommet);
-            }
-
-            public void AjouterLien(Lien lien)
-            {
-                liens.Add(lien);
-                if (oriente == false)
+                // Créer un pinceau pour dessiner les liens
+                SKPaint lienPaint = new SKPaint
                 {
-                    Lien reciproque = new Lien(lien.Sommet2, lien.Sommet1);
-                    liens.Add(reciproque);
+                    Color = SKColors.Black,
+                    StrokeWidth = 2,
+                    IsAntialias = true
+                };
+
+                // Créer un pinceau pour dessiner les sommets
+                SKPaint sommetPaint = new SKPaint
+                {
+                    Color = SKColors.Blue,
+                    IsAntialias = true,
+                    Style = SKPaintStyle.Fill
+                };
+
+                // Créer un pinceau pour dessiner le texte des sommets
+                SKPaint textPaint = new SKPaint
+                {
+                    Color = SKColors.Black,
+                    TextSize = 30,
+                    IsAntialias = true
+                };
+
+                // Position des sommets (un exemple simple)
+                Dictionary<Sommet, SKPoint> positions = new Dictionary<Sommet, SKPoint>();
+                int angleStep = 360 / graphe.Sommets.Count;
+                int rayon = 350;
+                SKPoint centre = new SKPoint(largeurImage / 2, hauteurImage / 2);
+                int angle = 0;
+
+                // Calculer les positions des sommets en cercle
+                foreach (Sommet sommet in graphe.Sommets)
+                {
+                    float x = centre.X + rayon * (float)Math.Cos(Math.PI * angle / 180);
+                    float y = centre.Y + rayon * (float)Math.Sin(Math.PI * angle / 180);
+                    positions[sommet] = new SKPoint(x, y);
+                    angle += angleStep;
                 }
-            }
 
-            public void SupprimerLien(Lien lienSupp)
-            {
-                foreach(Lien lien in liens)
+                // Dessiner les liens entre les sommets
+                foreach (Lien lien in graphe.Liens)
                 {
-                    if (lien == lienSupp)
+                    // Vérifier si les sommets existent dans le dictionnaire avant de dessiner
+                    if (positions.ContainsKey(lien.Sommet1) && positions.ContainsKey(lien.Sommet2))
                     {
-                        liens.Remove(lien);
-                        if (oriente == false)
-                        {
-                            Lien reciproque = new Lien(lien.Sommet2, lien.Sommet1);
-                            liens.Remove(reciproque);
-                        }
+                        SKPoint point1 = positions[lien.Sommet1];
+                        SKPoint point2 = positions[lien.Sommet2];
+                        canvas.DrawLine(point1, point2, lienPaint);
                     }
                 }
-            }
 
-            public List<Lien> LiensParSommet(Sommet sommet)
-            {
-                List<Lien> liensSommet = new List<Lien>();
-                foreach (Lien lien in liens)
+                // Dessiner les sommets
+                foreach (KeyValuePair<Sommet, SKPoint> entry in positions)
                 {
-                    if (lien.Sommet1 == sommet)
-                    {
-                        liensSommet.Add(lien);
-                    }
+                    SKPoint position = entry.Value;
+                    canvas.DrawCircle(position, 20, sommetPaint);  // Dessiner le sommet comme un cercle
+                    canvas.DrawText(entry.Key.Nom, position.X - 10, position.Y + 10, textPaint);  // Dessiner le nom du sommet
                 }
-                return liensSommet;
-            }
 
-            public override string ToString()
-            {
-                string s = "";
-                foreach (Sommet sommet in sommets)
+                // Sauvegarder l'image dans un fichier
+                using (var image = SKImage.FromBitmap(bitmap))
+                using (var data = image.Encode())
+                using (var stream = File.OpenWrite(fichierImage))
                 {
-                    s = s + sommet.Nom + " - {";
-                    List<Lien> liensSommet = LiensParSommet(sommet);
-                    for (int i = 0; i < liensSommet.Count; i++)
-                    {
-                        s = s + liensSommet[i].Sommet2.ToString() + ", ";
-                    }
-                    s = s + "}\n";
+                    data.SaveTo(stream);
                 }
-                return s;
             }
         }
-
-        static void TestGrapheOriente()
-        {
-            List<Sommet> sommets = new List<Sommet>();
-            List<Lien> liens = new List<Lien>();
-            Graphe graphe = new Graphe(true);
-            Sommet A = new Sommet("A"); graphe.AjouterSommet(A);
-            Sommet B = new Sommet("B"); graphe.AjouterSommet(B);
-            Sommet C = new Sommet("C"); graphe.AjouterSommet(C);
-            Sommet D = new Sommet("D"); graphe.AjouterSommet(D);
-            Sommet E = new Sommet("E"); graphe.AjouterSommet(E);
-            Sommet F = new Sommet("F"); graphe.AjouterSommet(F);
-            Lien lienAB = new Lien(A, B); graphe.AjouterLien(lienAB);
-            Lien lienAC = new Lien(A, C); graphe.AjouterLien(lienAC);
-            Lien lienBD = new Lien(B, D); graphe.AjouterLien(lienBD);
-            Lien lienCB = new Lien(C, B); graphe.AjouterLien(lienCB);
-            Lien lienCD = new Lien(C, D); graphe.AjouterLien(lienCD);
-            Lien lienDB = new Lien(D, B); graphe.AjouterLien(lienDB);
-            Lien lienEF = new Lien(E, F); graphe.AjouterLien(lienEF);
-            Lien lienFE = new Lien(F, E); graphe.AjouterLien(lienFE);
-            Console.WriteLine(A);
-            Console.WriteLine(E);
-            Console.WriteLine(lienAB);
-            Console.WriteLine("Graphe orienté : ");
-            Console.WriteLine(graphe);
-        }
-
-        static void TestGrapheNonOriente()
-        {
-            List<Sommet> sommets = new List<Sommet>();
-            List<Lien> liens = new List<Lien>();
-            Graphe graphe = new Graphe(false);
-            Sommet A = new Sommet("A"); graphe.AjouterSommet(A);
-            Sommet B = new Sommet("B"); graphe.AjouterSommet(B);
-            Sommet C = new Sommet("C"); graphe.AjouterSommet(C);
-            Sommet D = new Sommet("D"); graphe.AjouterSommet(D);
-            Sommet E = new Sommet("E"); graphe.AjouterSommet(E);
-            Sommet F = new Sommet("F"); graphe.AjouterSommet(F);
-            Lien lienAB = new Lien(A, B); graphe.AjouterLien(lienAB);
-            Lien lienAC = new Lien(A, C); graphe.AjouterLien(lienAC);
-            Lien lienBD = new Lien(B, D); graphe.AjouterLien(lienBD);
-            Lien lienCB = new Lien(C, B); graphe.AjouterLien(lienCB);
-            Lien lienCD = new Lien(C, D); graphe.AjouterLien(lienCD);
-            Lien lienEF = new Lien(E, F); graphe.AjouterLien(lienEF);
-            Lien lienFE = new Lien(F, E); graphe.AjouterLien(lienFE);
-            Console.WriteLine("Graphe non orienté : ");
-            Console.WriteLine(graphe);
-        }
-
 
         static void Main(string[] args)
         {
-            TestGrapheOriente();
-            TestGrapheNonOriente();
+            Graphe association = LireFichier();
+            Console.WriteLine("Liste d'adjacence : ");
+            association.AfficherListeAdjacence();
 
+            Console.Write("\nPour les parcours, rentrer un sommet (entre 1 et 34) : ");
+            string res = Console.ReadLine();
+            Sommet s = new Sommet("");
+            foreach (Sommet som in association.Sommets) { if (som.Nom == res) { s = som; } }
+
+            Console.WriteLine("\nParcours en largeur à partir du sommet " + s.Nom);
+            association.ParcoursEnLargeur(s);
+
+            Console.WriteLine("\n\n" + "Parcours en profondeur à partir du sommet " + s.Nom);
+            association.ParcoursEnProfondeur(s);
+            Console.WriteLine("\n");
+
+            if (association.EstConnexe()) { Console.WriteLine("\nD'après le DFS, le graphe est connexe"); }
+            else { Console.WriteLine("D'après le DFS, il n'est pas connexe"); }
+
+            DessinerGraphe(association, "graphe.png");
+            Console.WriteLine("\nGraphe affiché dans le dossier bin/Debut/7.0 du projet sous le nom graphe.png");
         }
+        
     }
 }
