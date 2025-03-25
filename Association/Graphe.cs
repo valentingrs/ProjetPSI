@@ -3,21 +3,21 @@ namespace Association
 {
 	public class Graphe
 	{
-		private List<Sommet> sommets;
+		private List<Noeud> noeuds;
 		private List<Lien> liens;
 		private bool oriente;
 
 		public Graphe(bool oriente)
 		{
-			sommets = new List<Sommet>();
+            noeuds = new List<Noeud>();
 			liens = new List<Lien>();
 			this.oriente = oriente;
 		}
 
-		public List<Sommet> Sommets
+		public List<Noeud> Noeuds
 		{
-			get { return sommets; }
-			set { sommets = value; }
+			get { return noeuds; }
+			set { noeuds = value; }
 		}
 
 		public List<Lien> Liens
@@ -31,14 +31,14 @@ namespace Association
 			set { oriente = value; }
 		}
 
-		public void AjouterSommet(Sommet sommet)
+		public void AjouterSommet(Noeud sommet)
 		{
-			if (!ContientSommet(sommet)) { sommets.Add(sommet); }
+			if (!ContientSommet(sommet)) { noeuds.Add(sommet); }
 		}
 
-		public bool ContientSommet(Sommet sommetRecherche)
+		public bool ContientSommet(Noeud sommetRecherche)
 		{
-			foreach (Sommet sommet in sommets)
+			foreach (Noeud sommet in noeuds)
 			{
 				if (sommet == sommetRecherche) { return true; }
 			}
@@ -57,32 +57,32 @@ namespace Association
 
 		public void AjouterLien(Lien lien)
 		{
-			if (!ContientLien(lien)) { liens.Add(lien); lien.Sommet1.AjouterVoisin(lien.Sommet2); }
+			if (!ContientLien(lien)) { liens.Add(lien); lien.Noeud1.AjouterVoisin(lien.Noeud2); }
 
 			if (oriente == false)
 			{
-				Lien reciproque = new Lien(lien.Sommet2, lien.Sommet1);
-				if (!ContientLien(reciproque)) { liens.Add(reciproque); reciproque.Sommet1.AjouterVoisin(reciproque.Sommet2); }
+				Lien reciproque = new Lien(lien.Noeud2, lien.Noeud1);
+				if (!ContientLien(reciproque)) { liens.Add(reciproque); reciproque.Noeud1.AjouterVoisin(reciproque.Noeud2); }
 			}
 		}
 
-		public List<Lien> LiensParSommet(Sommet sommet)
+		public List<Lien> LiensParNoeud(Noeud noeud)
 		{
-			List<Lien> liensSommet = new List<Lien>();
+			List<Lien> liensNoeud = new List<Lien>();
 			foreach (Lien lien in liens)
 			{
-				if (lien.Sommet1 == sommet)
+				if (lien.Noeud1 == noeud)
 				{
-					liensSommet.Add(lien);
+                    liensNoeud.Add(lien);
 				}
 			}
-			return liensSommet;
+			return liensNoeud;
 		}
 
-		public Dictionary<Sommet, List<Sommet>> ListeAdjacence()
+		public Dictionary<Noeud, List<Noeud>> ListeAdjacence()
 		{
-			Dictionary<Sommet, List<Sommet>> listeAdj = new Dictionary<Sommet, List<Sommet>>();
-			foreach (Sommet sommet in sommets)
+			Dictionary<Noeud, List<Noeud>> listeAdj = new Dictionary<Noeud, List<Noeud>>();
+			foreach (Noeud sommet in noeuds)
 			{
 				listeAdj[sommet] = sommet.Voisins;
 			}
@@ -91,7 +91,7 @@ namespace Association
 
 		public void AfficherListeAdjacence()
 		{
-			Dictionary<Sommet, List<Sommet>> listeAdj = ListeAdjacence();  // Récupérer la liste d'adjacence
+			Dictionary<Noeud, List<Noeud>> listeAdj = ListeAdjacence();  // Récupérer la liste d'adjacence
 			foreach (var entry in listeAdj)
 			{
 				// Afficher le sommet et ses voisins
@@ -100,13 +100,13 @@ namespace Association
 			}
 		}
 
-		public void ParcoursEnLargeur(Sommet depart)
+		public void ParcoursEnLargeur(Noeud depart)
 		{
-			Queue<Sommet> file = new Queue<Sommet>(); // file de sommets FIFO
+			Queue<Noeud> file = new Queue<Noeud>(); // file de sommets FIFO
 
-			Dictionary<Sommet, bool> visite = new Dictionary<Sommet, bool>(); // dictionnaire des marquages
+			Dictionary<Noeud, bool> visite = new Dictionary<Noeud, bool>(); // dictionnaire des marquages
 
-			foreach (Sommet sommet in sommets)
+			foreach (Noeud sommet in noeuds)
 			{
 				visite[sommet] = false;
 			}
@@ -117,10 +117,10 @@ namespace Association
 			// Parcours en largeur
 			while (file.Count > 0)
 			{
-				Sommet sommetCourant = file.Dequeue();
+                Noeud sommetCourant = file.Dequeue();
 				Console.Write(sommetCourant.Nom + " ");
 
-				foreach (Sommet voisin in sommetCourant.Voisins)
+				foreach (Noeud voisin in sommetCourant.Voisins)
 				{
 					if (visite.ContainsKey(voisin) && !visite[voisin])
 					{
@@ -131,13 +131,13 @@ namespace Association
 			}
 		}
 
-		public void ParcoursEnProfondeur(Sommet depart)
+		public void ParcoursEnProfondeur(Noeud depart)
 		{
 			// Utilisation d'un dictionnaire pour garder une trace des sommets visités
-			Dictionary<Sommet, bool> visite = new Dictionary<Sommet, bool>();
+			Dictionary<Noeud, bool> visite = new Dictionary<Noeud, bool>();
 
 			// Initialisation
-			foreach (Sommet sommet in sommets)
+			foreach (Noeud sommet in noeuds)
 			{
 				visite[sommet] = false;
 			}
@@ -146,14 +146,14 @@ namespace Association
 			ParcoursEnProfondeurRecursif(depart, visite);
 		}
 
-		private void ParcoursEnProfondeurRecursif(Sommet sommetCourant, Dictionary<Sommet, bool> visite)
+		private void ParcoursEnProfondeurRecursif(Noeud sommetCourant, Dictionary<Noeud, bool> visite)
 		{
 			// Marquer le sommet courant comme visité
 			visite[sommetCourant] = true;
 			Console.Write(sommetCourant.Nom + " ");
 
 			// Parcourir tous les voisins du sommet courant
-			foreach (Sommet voisin in sommetCourant.Voisins)
+			foreach (Noeud voisin in sommetCourant.Voisins)
 			{
 				if (visite.ContainsKey(voisin) && !visite[voisin])
 				{
@@ -164,13 +164,13 @@ namespace Association
 
 		public bool EstConnexe() // utilsiation du dfs
 		{
-			if (sommets.Count == 0) return true; 
+			if (noeuds.Count == 0) return true;
 
-			Sommet sommetDeDepart = sommets[0];
+            Noeud sommetDeDepart = noeuds[0];
 
-			Dictionary<Sommet, bool> visite = new Dictionary<Sommet, bool>();
+			Dictionary<Noeud, bool> visite = new Dictionary<Noeud, bool>();
 
-			foreach (Sommet sommet in sommets)
+			foreach (Noeud sommet in noeuds)
 			{
 				visite[sommet] = false;
 			}
@@ -178,7 +178,7 @@ namespace Association
 			ParcoursEnProfondeurRecursif(sommetDeDepart, visite);
 
 			int sommetsVisites = visite.Values.Count(v => v == true); 
-			return sommetsVisites == sommets.Count;
+			return sommetsVisites == noeuds.Count;
 		}
 	}
 }

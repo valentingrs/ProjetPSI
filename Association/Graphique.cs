@@ -20,28 +20,28 @@ namespace Association
 				string[] ligne = lignes[i].Split(' ');
 
 				string s0 = ligne[0];
-				Sommet sommet0 = new Sommet("");
+				Noeud noeud0 = new Noeud("");
 				bool existeDeja = false;
-				foreach (Sommet k in association.Sommets)
+				foreach (Noeud k in association.Noeuds)
 				{
-					if (k.Nom == s0) { sommet0 = k; existeDeja = true; }
+					if (k.Nom == s0) { noeud0 = k; existeDeja = true; }
 
 				}
-				if (existeDeja == false) { sommet0 = new Sommet(s0); }
+				if (existeDeja == false) { noeud0 = new Noeud(s0); }
 
 				existeDeja = false;
 				string s1 = ligne[1];
-				Sommet sommet1 = new Sommet("");
-				foreach (Sommet j in association.Sommets)
+				Noeud noeud1 = new Noeud("");
+				foreach (Noeud j in association.Noeuds)
 				{
-					if (j.Nom == s1) { sommet1 = j; existeDeja = true; }
+					if (j.Nom == s1) { noeud1 = j; existeDeja = true; }
 				}
-				if (existeDeja == false) { sommet1 = new Sommet(s1); }
+				if (existeDeja == false) { noeud1 = new Noeud(s1); }
 
-				Lien l = new Lien(sommet0, sommet1);
+				Lien l = new Lien(noeud0, noeud1);
 
-				if (!association.ContientSommet(sommet0)) { association.AjouterSommet(sommet0); }
-				if (!association.ContientSommet(sommet1)) { association.AjouterSommet(sommet1); }
+				if (!association.ContientSommet(noeud0)) { association.AjouterSommet(noeud0); }
+				if (!association.ContientSommet(noeud1)) { association.AjouterSommet(noeud1); }
 
 				association.AjouterLien(l);
 
@@ -87,18 +87,18 @@ namespace Association
 				};
 
 				// Position des sommets (un exemple simple)
-				Dictionary<Sommet, SKPoint> positions = new Dictionary<Sommet, SKPoint>();
-				int angleStep = 360 / graphe.Sommets.Count;
+				Dictionary<Noeud, SKPoint> positions = new Dictionary<Noeud, SKPoint>();
+				int angleStep = 360 / graphe.Noeuds.Count;
 				int rayon = 350;
 				SKPoint centre = new SKPoint(largeurImage / 2, hauteurImage / 2);
 				int angle = 0;
 
 				// Calculer les positions des sommets en cercle
-				foreach (Sommet sommet in graphe.Sommets)
+				foreach (Noeud noeud in graphe.Noeuds)
 				{
 					float x = centre.X + rayon * (float)Math.Cos(Math.PI * angle / 180);
 					float y = centre.Y + rayon * (float)Math.Sin(Math.PI * angle / 180);
-					positions[sommet] = new SKPoint(x, y);
+					positions[noeud] = new SKPoint(x, y);
 					angle += angleStep;
 				}
 
@@ -106,16 +106,16 @@ namespace Association
 				foreach (Lien lien in graphe.Liens)
 				{
 					// Vérifier si les sommets existent dans le dictionnaire avant de dessiner
-					if (positions.ContainsKey(lien.Sommet1) && positions.ContainsKey(lien.Sommet2))
+					if (positions.ContainsKey(lien.Noeud1) && positions.ContainsKey(lien.Noeud2))
 					{
-						SKPoint point1 = positions[lien.Sommet1];
-						SKPoint point2 = positions[lien.Sommet2];
+						SKPoint point1 = positions[lien.Noeud1];
+						SKPoint point2 = positions[lien.Noeud2];
 						canvas.DrawLine(point1, point2, lienPaint);
 					}
 				}
 
 				// Dessiner les sommets
-				foreach (KeyValuePair<Sommet, SKPoint> entry in positions)
+				foreach (KeyValuePair<Noeud, SKPoint> entry in positions)
 				{
 					SKPoint position = entry.Value;
 					canvas.DrawCircle(position, 20, sommetPaint);  // Dessiner le sommet comme un cercle

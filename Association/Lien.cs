@@ -4,30 +4,30 @@ namespace Association
 {
 	public class Lien
 	{
-		private Sommet sommet1;
-		private Sommet sommet2;
+		private Noeud noeud1;
+		private Noeud noeud2;
 
-		public Lien(Sommet sommet1, Sommet sommet2)
+		public Lien(Noeud noeud1, Noeud noeud2)
 		{
-			this.sommet1 = sommet1;
-			this.sommet2 = sommet2;
+			this.noeud1 = noeud1;
+			this.noeud2 = noeud2;
 		}
 
-		public Sommet Sommet1
+		public Noeud Noeud1
 		{
-			get { return sommet1; }
-			set { sommet1 = value; }
+			get { return noeud1; }
+			set { noeud1 = value; }
 		}
 
-		public Sommet Sommet2
-		{
-			get { return sommet2; }
-			set { sommet2 = value; }
+		public Noeud Noeud2
+        {
+			get { return noeud2; }
+			set { noeud2 = value; }
 		}
 
 		public override string ToString()
 		{
-			string s = sommet1.Nom + " - " + sommet2.Nom;
+			string s = noeud1.Nom + " - " + noeud2.Nom;
 			return s;
 		}
 	}

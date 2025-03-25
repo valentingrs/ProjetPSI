@@ -2,14 +2,14 @@ using System;
 
 namespace Association
 {
-	public class Sommet
+	public class Noeud
 	{
 		private string nom;
-		private List<Sommet> voisins;
+		private List<Noeud> voisins;
 
-		public Sommet(string nom)
+		public Noeud(string nom)
 		{
-			voisins = new List<Sommet>();
+			voisins = new List<Noeud>();
 			this.nom = nom;
 		}
 
@@ -19,13 +19,13 @@ namespace Association
 			set { nom = value; }
 		}
 
-		public List<Sommet> Voisins
+		public List<Noeud> Voisins
 		{
 			get { return voisins; }
 			set { voisins = value; }
 		}
 
-		public void AjouterVoisin(Sommet s)
+		public void AjouterVoisin(Noeud s)
 		{
 			voisins.Add(s);
 		}
@@ -40,17 +40,17 @@ namespace Association
 			return voisins.Count;
 		}
 
-		public bool Equals(Sommet sommet2)
+		public bool Equals(Noeud sommet2)
 		{
 			return (nom == sommet2.nom);
 		}
 
-		public static bool operator ==(Sommet s1, Sommet s2)
+		public static bool operator ==(Noeud s1, Noeud s2)
 		{
 			return s1.Equals(s2);
 		}
 
-		public static bool operator !=(Sommet s1, Sommet s2)
+		public static bool operator !=(Noeud s1, Noeud s2)
 		{
 			return !(s1 == s2);
 		}
@@ -64,7 +64,7 @@ namespace Association
 			else
 			{
 				Console.WriteLine($"Les voisins de {nom} sont :");
-				foreach (Sommet voisin in voisins)
+				foreach (Noeud voisin in voisins)
 				{
 					Console.Write(voisin.Nom  + " ");
 				}

@@ -14,8 +14,8 @@ namespace Association
 
             Console.Write("\nPour les parcours, rentrer un sommet (entre 1 et 34) : ");
             string res = Console.ReadLine();
-            Sommet s = new Sommet("");
-            foreach (Sommet som in association.Sommets) { if (som.Nom == res) { s = som; } }
+            Noeud s = new Noeud("");
+            foreach (Noeud som in association.Noeuds) { if (som.Nom == res) { s = som; } }
 
             Console.WriteLine("\nParcours en largeur à partir du sommet " + s.Nom);
             association.ParcoursEnLargeur(s);
