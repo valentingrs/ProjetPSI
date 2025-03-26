@@ -68,6 +68,18 @@ namespace Association
 			return lienReturn;
 		}
 
+		public Noeud<T> IdentifierNoeud(T nom)
+		{
+			Noeud<T> noeudTrouve;
+			foreach(Noeud<T> noeud in this.Noeuds)
+			{
+				if (noeud.Nom.Equals(nom)) {  return noeud; }
+			}
+			Console.WriteLine("Pas de noeud trouve.");
+            noeudTrouve = null;
+			return noeudTrouve;
+		}
+
 		public void AjouterLien(Lien<T> lien)
 		{
 			if (!ContientLien(lien)) { liens.Add(lien); lien.Noeud1.AjouterVoisin(lien.Noeud2); }
