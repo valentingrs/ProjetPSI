@@ -11,11 +11,9 @@ namespace Association
         //station de métro
         static public List<Station> LireStationMetro(string filename) // extrait du fichier MetroParis toutes les stations de métro de Paris
         {
-            List<Station> stationsParis = new List<Station>(); 
-
+            List<Station> stationsParis = new List<Station>();
 
             if(!File.Exists(filename)) { Console.WriteLine("Le fichier n'existe pas"); }
-
 
             FileInfo fileinfo = new FileInfo(filename);
             using (ExcelPackage package = new ExcelPackage(fileinfo)) // lecture du fichier xlsx
@@ -35,10 +33,26 @@ namespace Association
                         double.Parse(worksheet.Cells[row, 5].Text, CultureInfo.InvariantCulture),
                         worksheet.Cells[row, 6].Text);
 
-                    stationsParis.Add(s);                   
+                    stationsParis.Add(s);
                 }
 
                 return stationsParis;
+            }
+        }
+
+        static public List<Lien<Station>> LienStationMetro(List<Noeud<Station>> noeudStations, string filename) // extraction des données de la deuxième feuille
+        {
+            List<Lien<Station>> liens = new List<Lien<Station>>();
+
+            if (!File.Exists(filename)) { Console.WriteLine("Le fichier n'existe pas"); }
+
+            FileInfo fileinfo = new FileInfo(filename);
+            using (ExcelPackage package = new ExcelPackage(fileinfo))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // lecture de la deuxième feuille excel
+
+                // lecture des données de la feuille
+                int rowCount = worksheet.Dimension.Rows; // nombre de lignes = nombre de stations
             }
         }
 
@@ -67,14 +81,12 @@ namespace Association
             Console.WriteLine("\nGraphe affiché dans le dossier bin/Debut/7.0 du projet sous le nom graphe.png");
         }
 
-        public List<Noeud<Station>> NoeudsParis(List<Station> listeStations)
+        public void GrapheParis(List<Noeud<Station>> noeudsStation, List<Lien<Station>> liensStations)
         {
-            List<Noeud<Station>> listeNoeuds = new List<Noeud<Station>>();
-            foreach (Station station in listeStations)
-            {
-                Noeud<Station> noeud = new Noeud<Station>(station);
-                listeNoeuds.Add(noeud);
-            }
+            Graphe<Station> grapheParis = new Graphe<Station>(true); // graphe représentant le réseau du métro parisien
+            foreach(Noeud<Station> noeud in  noeudsStation) { grapheParis.AjouterSommet(noeud); }
+            foreach(Lien<Station> lien in liensStations) { grapheParis.AjouterLien(lien); }
+            
         }
 
         static void Main(string[] args)
