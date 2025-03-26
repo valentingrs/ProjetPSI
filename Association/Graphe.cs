@@ -53,7 +53,20 @@ namespace Association
 			return false;
 		}
 
+		public Lien<T> IdentifierLien(Noeud<T> noeud1, Noeud<T> noeud2)
+		// trouver un lien dans le graphe entre deux sommets données
+		{
+			List<Lien<T>> liensNoeud1 = LiensParNoeud(noeud1);
+			Lien<T> lienReturn = new Lien<T>(null, null);
+			foreach (Lien<T> lien in liensNoeud1)
+			{
+				lienReturn = lien;
+				if (lien.Noeud2 == noeud2) { return lienReturn; }
+			}
 
+			Console.WriteLine("Pas de lien trouvé");
+			return lienReturn;
+		}
 
 		public void AjouterLien(Lien<T> lien)
 		{
