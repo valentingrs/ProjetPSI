@@ -40,7 +40,8 @@ namespace Association
             }
         }
 
-        static public List<Lien<Station>> LienStationMetro(List<Noeud<Station>> noeudStations, string filename) // extraction des données de la deuxième feuille
+        /// il faudrait plus tard modifier le code pour qu'il prenne en paramètre une liste de noeuds plutot qu'un graphe
+        static public List<Lien<Station>> LienStationMetro(Graphe<Station> grapheParis, string filename) // extraction des données de la deuxième feuille
         {
             List<Lien<Station>> liens = new List<Lien<Station>>();
 
@@ -49,10 +50,18 @@ namespace Association
             FileInfo fileinfo = new FileInfo(filename);
             using (ExcelPackage package = new ExcelPackage(fileinfo))
             {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // lecture de la deuxième feuille excel
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[1]; // lecture de la deuxième feuille excel
 
                 // lecture des données de la feuille
                 int rowCount = worksheet.Dimension.Rows; // nombre de lignes = nombre de stations
+
+                for (int row = 2; row <= rowCount; row++) // chaque lien 
+                {
+                    // On identifie les stations 
+
+                    grapheParis.IdentifierNoeud()
+
+                }
             }
         }
 

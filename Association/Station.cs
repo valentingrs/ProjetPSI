@@ -9,6 +9,9 @@ namespace Association
 		private double longitude;
 		private double latitude;
 		private string commune;
+		private Station precedente;
+		private Station suivante;
+
 
 		public Station(int idStation, string ligneMetro, string nomStation, double longitude, double latitude, string commune)
 		{
@@ -22,7 +25,11 @@ namespace Association
 
 		public override string ToString()
 		{
+			if (precedente == null) { precedente.nomStation = "Terminus"; }
+			if (suivante == null) { suivante.nomStation = "Terminus"; }
+
 			string s = nomStation + " - Ligne " + ligneMetro + " (" + longitude + ", " + latitude + ")";
+			s = s + "Précédente : " + precedente.nomStation + " ; Suivante : " + suivante.nomStation;
 			return s;
 		}
 
