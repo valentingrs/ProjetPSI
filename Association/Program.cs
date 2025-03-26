@@ -67,6 +67,16 @@ namespace Association
             Console.WriteLine("\nGraphe affiché dans le dossier bin/Debut/7.0 du projet sous le nom graphe.png");
         }
 
+        public List<Noeud<Station>> NoeudsParis(List<Station> listeStations)
+        {
+            List<Noeud<Station>> listeNoeuds = new List<Noeud<Station>>();
+            foreach (Station station in listeStations)
+            {
+                Noeud<Station> noeud = new Noeud<Station>(station);
+                listeNoeuds.Add(noeud);
+            }
+        }
+
         static void Main(string[] args)
         {
             List<Station> stationsParis = LireStationMetro("MetroParis.xlsx");
