@@ -4,13 +4,13 @@ namespace Association
 	public class Station
 	{
 		private int idStation;
-		private int ligneMetro;
+		private string ligneMetro;
 		private string nomStation;
-		private float longitude;
-		private float latitude;
+		private double longitude;
+		private double latitude;
 		private string commune;
 
-		public Station(int idStation, int ligneMetro,  string nomStation, float longitude, float latitude, string commune)
+		public Station(int idStation, string ligneMetro,  string nomStation, double longitude, double latitude, string commune)
 		{
 			this.idStation = idStation;
 			this.ligneMetro = ligneMetro;
@@ -20,6 +20,11 @@ namespace Association
 			this.commune = commune;
 		}
 
+        public override string ToString()
+        {
+			string s = nomStation + " - Ligne " + ligneMetro + " (" + longitude + ", " + latitude + ")";
+			return s;
+        }
 
-	}
+    }
 }
