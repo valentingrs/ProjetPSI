@@ -1,11 +1,62 @@
-﻿using static Association.Graphique;
+﻿using System.Globalization;
+using static Association.Graphique;
+using OfficeOpenXml;
+using System.Collections.Generic;
 
 
 namespace Association
 {
     internal class Program
     {
-        static void Association()
+        //station de métro
+        static public List<Station> LireStationMetro(string filename) // extrait du fichier MetroParis toutes les stations de métro de Paris
+        {
+            List<Station> stationsParis = new List<Station>();
+
+            if (!File.Exists(filename)) { Console.WriteLine("Le fichier n'existe pas"); }
+
+            FileInfo fileinfo = new FileInfo(filename);
+            using (ExcelPackage package = new ExcelPackage(fileinfo)) // lecture du fichier xlsx
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // lecture de la première feuille excel
+
+                // lecture des données de la feuille
+                int rowCount = worksheet.Dimension.Rows; // nombre de lignes = nombre de stations
+
+                // on connait la forme du fichier Excel du métro parisien
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    Station s = new Station(int.Parse(worksheet.Cells[row, 1].Text),
+                        worksheet.Cells[row, 2].Text,
+                        worksheet.Cells[row, 3].Text,
+                        double.Parse(worksheet.Cells[row, 4].Text, CultureInfo.InvariantCulture),
+                        double.Parse(worksheet.Cells[row, 5].Text, CultureInfo.InvariantCulture),
+                        worksheet.Cells[row, 6].Text);
+
+                    stationsParis.Add(s);
+                }
+
+                return stationsParis;
+            }
+        }
+
+        static public List<Lien<Station>> LienStationMetro(List<Noeud<Station>> noeudStations, string filename) // extraction des données de la deuxième feuille
+        {
+            List<Lien<Station>> liens = new List<Lien<Station>>();
+
+            if (!File.Exists(filename)) { Console.WriteLine("Le fichier n'existe pas"); }
+
+            FileInfo fileinfo = new FileInfo(filename);
+            using (ExcelPackage package = new ExcelPackage(fileinfo))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // lecture de la deuxième feuille excel
+
+                // lecture des données de la feuille
+                int rowCount = worksheet.Dimension.Rows; // nombre de lignes = nombre de stations
+            }
+        }
+
+        public void GrapheAssociation() /// fonction de test du Rendu 1
         {
             Graphe<string> association = Graphique.LireFichier();
             Console.WriteLine("Liste d'adjacence : ");
@@ -30,29 +81,23 @@ namespace Association
             Console.WriteLine("\nGraphe affiché dans le dossier bin/Debut/7.0 du projet sous le nom graphe.png");
         }
 
-        static void TestIdentifierLien()
+        public void GrapheParis(List<Noeud<Station>> noeudsStation, List<Lien<Station>> liensStations)
         {
-            Graphe<int> graphe = new Graphe<int>(true);
+            Graphe<Station> grapheParis = new Graphe<Station>(true); // graphe représentant le réseau du métro parisien
+            foreach (Noeud<Station> noeud in noeudsStation) { grapheParis.AjouterSommet(noeud); }
+            foreach (Lien<Station> lien in liensStations) { grapheParis.AjouterLien(lien); }
 
-            Noeud<int> n1 = new Noeud<int>(1); graphe.AjouterSommet(n1);
-            Noeud<int> n2 = new Noeud<int>(2); graphe.AjouterSommet(n2);
-            Noeud<int> n3 = new Noeud<int>(3); graphe.AjouterSommet(n3);
-            Noeud<int> n4 = new Noeud<int>(4); graphe.AjouterSommet(n4);
-            Lien<int> l1 = new Lien<int>(n1, n2); graphe.AjouterLien(l1);
-            Lien<int> l2 = new Lien<int>(n1, n4); graphe.AjouterLien(l2);
-            Lien<int> l3 = new Lien<int>(n2, n3); graphe.AjouterLien(l3);
-            Lien<int> l4 = new Lien<int>(n3, n4); graphe.AjouterLien(l4);
-
-            Lien<int> lienid = graphe.IdentifierLien(n3, n4);
-            Console.WriteLine(lienid);
         }
 
         static void Main(string[] args)
         {
-            
-
+            List<Station> stationsParis = LireStationMetro("MetroParis.xlsx");
+            Console.WriteLine(stationsParis[5]);
+            Console.WriteLine(stationsParis[8]);
+            Console.WriteLine(stationsParis[0]);
+            Console.WriteLine(stationsParis[331]);
 
         }
-        
+
     }
 }
