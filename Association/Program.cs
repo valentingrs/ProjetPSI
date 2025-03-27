@@ -8,61 +8,94 @@ namespace Association
 {
     internal class Program
     {
-        //station de métro
-        static public List<Station> LireStationMetro(string filename) // extrait du fichier MetroParis toutes les stations de métro de Paris
+
+        public static Station IdentifierStationId(List<Station> stations, int id)
         {
-            List<Station> stationsParis = new List<Station>();
+            Station identifiee;
+            foreach (Station station in stations)
+            {
+                if (station.IdStation == id) { identifiee = station; return identifiee; }
+            }
+            Console.WriteLine("Pas de station ayant ce nom dans la liste");
+            return null;
+        }
+
+        //station de métro
+        static public Graphe<Station> LireStationMetro(string filename) // extrait du fichier MetroParis toutes les stations de métro de Paris
+        {
+            Graphe<Station> grapheParis = new Graphe<Station>(true); // initialisation du graphe du métro parisien
+            List<Station> stationsParis = new List<Station>(); // liste des stations de paris
+            Noeud<Station> noeudStation;
+
 
             if (!File.Exists(filename)) { Console.WriteLine("Le fichier n'existe pas"); }
 
             FileInfo fileinfo = new FileInfo(filename);
             using (ExcelPackage package = new ExcelPackage(fileinfo)) // lecture du fichier xlsx
             {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // lecture de la première feuille excel
+                ExcelWorksheet worksheet1 = package.Workbook.Worksheets[0]; // lecture de la première feuille excel -> stations de métro (noeuds)
+                ExcelWorksheet worksheet2 = package.Workbook.Worksheets[1]; // lecture de la première feuille excel -> lien entre les stations (arcs)
 
                 // lecture des données de la feuille
-                int rowCount = worksheet.Dimension.Rows; // nombre de lignes = nombre de stations
+                int rowCount1 = worksheet1.Dimension.Rows; // nombre de lignes = nombre de stations
+                int rowCount2 = worksheet2.Dimension.Rows;
 
                 // on connait la forme du fichier Excel du métro parisien
-                for (int row = 2; row <= rowCount; row++)
+                for (int row = 2; row <= rowCount1; row++)
                 {
-                    Station s = new Station(int.Parse(worksheet.Cells[row, 1].Text),
-                        worksheet.Cells[row, 2].Text,
-                        worksheet.Cells[row, 3].Text,
-                        double.Parse(worksheet.Cells[row, 4].Text, CultureInfo.InvariantCulture),
-                        double.Parse(worksheet.Cells[row, 5].Text, CultureInfo.InvariantCulture),
-                        worksheet.Cells[row, 6].Text);
+                    Station s = new Station(int.Parse(worksheet1.Cells[row, 1].Text),
+                        worksheet1.Cells[row, 2].Text,
+                        worksheet1.Cells[row, 3].Text,
+                        double.Parse(worksheet1.Cells[row, 4].Text, CultureInfo.InvariantCulture),
+                        double.Parse(worksheet1.Cells[row, 5].Text, CultureInfo.InvariantCulture),
+                        worksheet1.Cells[row, 6].Text);
 
-                    stationsParis.Add(s);
+                    noeudStation = new Noeud<Station>(s); // "conversion" de la station traitée en noeud
+                    stationsParis.Add(s); // ajout de la station à la liste des stations de Paris
+                    grapheParis.AjouterSommet(noeudStation); // on ajoute la station au plan du métro parisien
                 }
 
-                return stationsParis;
+                for (int row = 2; row <= rowCount2; row++)
+                {
+                    string stat = worksheet2.Cells[row, 1].Text;
+                    Station statActuelle = IdentifierStationId(stationsParis, Int32.Parse(stat));
+                    Noeud<Station> noeudActuel = grapheParis.IdentifierNoeud(statActuelle);
+
+                    string prec = worksheet2.Cells[row, 3].Text;
+                    if (prec != "")
+                    {
+                        Station statPrec = IdentifierStationId(stationsParis, Int32.Parse(prec));
+                        Noeud<Station> noeudPrec = grapheParis.IdentifierNoeud(statPrec);
+                        int temps = Int32.Parse(worksheet2.Cells[row, 5].Text);
+                        Lien<Station> lienPrecActuelle = new Lien<Station>(noeudPrec, noeudActuel, temps);
+                        grapheParis.AjouterLien(lienPrecActuelle);
+                    }        
+
+                    string suiv = worksheet2.Cells[row, 4].Text;
+                    if (suiv != "") 
+                    { 
+                        Station statSuiv = IdentifierStationId(stationsParis, Int32.Parse(suiv));
+                        Noeud<Station> noeudSuiv = grapheParis.IdentifierNoeud(statSuiv);
+                        int temps = Int32.Parse(worksheet2.Cells[row, 5].Text);
+                        Lien<Station> lienActuelleSuiv = new Lien<Station>(noeudActuel, noeudSuiv, temps);
+                        grapheParis.AjouterLien(lienActuelleSuiv);
+                    }
+                }
+
+                return grapheParis;
             }
         }
 
-        /// il faudrait plus tard modifier le code pour qu'il prenne en paramètre une liste de noeuds plutot qu'un graphe
-        static public List<Lien<Station>> LienStationMetro(Graphe<Station> grapheParis, string filename) // extraction des données de la deuxième feuille
+        public Noeud<Station> IdentifierNoeudStation(Station nom, List<Noeud<Station>> noeudsStation)
         {
-            List<Lien<Station>> liens = new List<Lien<Station>>();
-
-            if (!File.Exists(filename)) { Console.WriteLine("Le fichier n'existe pas"); }
-
-            FileInfo fileinfo = new FileInfo(filename);
-            using (ExcelPackage package = new ExcelPackage(fileinfo))
+            Noeud<Station> noeudTrouve;
+            foreach (Noeud<Station> noeud in noeudsStation)
             {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[1]; // lecture de la deuxième feuille excel
-
-                // lecture des données de la feuille
-                int rowCount = worksheet.Dimension.Rows; // nombre de lignes = nombre de stations
-
-                for (int row = 2; row <= rowCount; row++) // chaque lien 
-                {
-                    // On identifie les stations 
-
-                    grapheParis.IdentifierNoeud()
-
-                }
+                if (noeud.Nom.Equals(nom)) { return noeud; }
             }
+            Console.WriteLine("Pas de noeud trouve.");
+            noeudTrouve = null;
+            return noeudTrouve;
         }
 
         public void GrapheAssociation() /// fonction de test du Rendu 1
@@ -90,21 +123,10 @@ namespace Association
             Console.WriteLine("\nGraphe affiché dans le dossier bin/Debut/7.0 du projet sous le nom graphe.png");
         }
 
-        public void GrapheParis(List<Noeud<Station>> noeudsStation, List<Lien<Station>> liensStations)
-        {
-            Graphe<Station> grapheParis = new Graphe<Station>(true); // graphe représentant le réseau du métro parisien
-            foreach (Noeud<Station> noeud in noeudsStation) { grapheParis.AjouterSommet(noeud); }
-            foreach (Lien<Station> lien in liensStations) { grapheParis.AjouterLien(lien); }
-
-        }
-
         static void Main(string[] args)
         {
-            List<Station> stationsParis = LireStationMetro("MetroParis.xlsx");
-            Console.WriteLine(stationsParis[5]);
-            Console.WriteLine(stationsParis[8]);
-            Console.WriteLine(stationsParis[0]);
-            Console.WriteLine(stationsParis[331]);
+            Graphe<Station> stationsParis = LireStationMetro("MetroParis.xlsx");
+            DessinerGraphe(stationsParis, "metro.png");
 
         }
 

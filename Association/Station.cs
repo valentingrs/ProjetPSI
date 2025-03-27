@@ -23,6 +23,21 @@ namespace Association
 			this.commune = commune;
 		}
 
+		public int IdStation
+		{
+			get { return idStation; }
+		}
+
+		public void AjouterPrecedente(Station s)
+		{
+			precedente = s;
+		}
+
+		public void AjouterSuivante(Station s)
+		{
+			suivante = s;
+		}
+
 		public override string ToString()
 		{
 			if (precedente == null) { precedente.nomStation = "Terminus"; }

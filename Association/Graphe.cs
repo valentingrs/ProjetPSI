@@ -80,6 +80,8 @@ namespace Association
 			return noeudTrouve;
 		}
 
+
+
 		public void AjouterLien(Lien<T> lien)
 		{
 			if (!ContientLien(lien)) { liens.Add(lien); lien.Noeud1.AjouterVoisin(lien.Noeud2); }
