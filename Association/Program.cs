@@ -98,7 +98,7 @@ namespace Association
             return noeudTrouve;
         }
 
-        public void GrapheAssociation() /// fonction de test du Rendu 1
+        public static void GrapheAssociation() /// fonction de test du Rendu 1
         {
             Graphe<string> association = Graphique.LireFichier();
             Console.WriteLine("Liste d'adjacence : ");
@@ -121,13 +121,18 @@ namespace Association
 
             DessinerGraphe(association, "graphe.png");
             Console.WriteLine("\nGraphe affiché dans le dossier bin/Debut/7.0 du projet sous le nom graphe.png");
+
+            string cheminImage = Path.GetFullPath("graphe.png");
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = cheminImage,
+                UseShellExecute = true  // Permet d'utiliser l'application par défaut pour ouvrir l'image
+            });
         }
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            Graphe<Station> stationsParis = LireStationMetro("MetroParis.xlsx");
-            DessinerGraphe(stationsParis, "metro.png");
-
+            GrapheAssociation();
         }
 
     }
