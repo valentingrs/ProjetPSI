@@ -57,9 +57,11 @@ namespace Association
 
                 for (int row = 2; row <= rowCount2; row++)
                 {
+
                     string stat = worksheet2.Cells[row, 1].Text;
                     Station statActuelle = IdentifierStationId(stationsParis, Int32.Parse(stat));
                     Noeud<Station> noeudActuel = grapheParis.IdentifierNoeud(statActuelle);
+
 
                     string prec = worksheet2.Cells[row, 3].Text;
                     if (prec != "")
@@ -69,17 +71,21 @@ namespace Association
                         int temps = Int32.Parse(worksheet2.Cells[row, 5].Text);
                         Lien<Station> lienPrecActuelle = new Lien<Station>(noeudPrec, noeudActuel, temps);
                         grapheParis.AjouterLien(lienPrecActuelle);
-                    }        
+
+                    }
 
                     string suiv = worksheet2.Cells[row, 4].Text;
                     if (suiv != "") 
                     { 
                         Station statSuiv = IdentifierStationId(stationsParis, Int32.Parse(suiv));
                         Noeud<Station> noeudSuiv = grapheParis.IdentifierNoeud(statSuiv);
-                        int temps = Int32.Parse(worksheet2.Cells[row, 5].Text);
+                        int temps = Int32.Parse(worksheet2.Cells[row, 6].Text);
                         Lien<Station> lienActuelleSuiv = new Lien<Station>(noeudActuel, noeudSuiv, temps);
                         grapheParis.AjouterLien(lienActuelleSuiv);
+
                     }
+
+
                 }
 
                 return grapheParis;
@@ -98,7 +104,7 @@ namespace Association
             return noeudTrouve;
         }
 
-        public static void GrapheAssociation() /// fonction de test du Rendu 1
+        static public void GrapheAssociation() /// fonction de test du Rendu 1
         {
             Graphe<string> association = Graphique.LireFichier();
             Console.WriteLine("Liste d'adjacence : ");
@@ -119,7 +125,7 @@ namespace Association
             if (association.EstConnexe()) { Console.WriteLine("\nD'après le DFS, le graphe est connexe"); }
             else { Console.WriteLine("D'après le DFS, il n'est pas connexe"); }
 
-            DessinerGraphe(association, "graphe.png");
+            //DessinerGraphe(association, "graphe.png");
             Console.WriteLine("\nGraphe affiché dans le dossier bin/Debut/7.0 du projet sous le nom graphe.png");
 
             string cheminImage = Path.GetFullPath("graphe.png");
@@ -132,7 +138,24 @@ namespace Association
 
         public static void Main(string[] args)
         {
-            GrapheAssociation();
+            Graphe<Station> metroParis = LireStationMetro("MetroParis.xlsx");
+            // test sur Argentine
+            //Station Argentine = new Station(2, "1", "Argentine", 2.2894354185422134, 48.87566737565167, "75117");
+            //Console.WriteLine(Argentine);
+            //Noeud<Station> Arg = metroParis.IdentifierNoeud(Argentine);
+            //Console.WriteLine(Arg);
+            //metroParis.AfficherNoeuds();
+            //metroParis.AfficherLiens();
+
+            DessinerGraphe(metroParis, "metro.png");
+            string cheminImage = Path.GetFullPath("metro.png");
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = cheminImage,
+                UseShellExecute = true  // Permet d'utiliser l'application par défaut pour ouvrir l'image
+            });
+
+            //GrapheAssociation();
         }
 
     }

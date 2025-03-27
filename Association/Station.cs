@@ -9,8 +9,8 @@ namespace Association
 		private double longitude;
 		private double latitude;
 		private string commune;
-		private Station precedente;
-		private Station suivante;
+		//private Station precedente;
+		//private Station suivante;
 
 
 		public Station(int idStation, string ligneMetro, string nomStation, double longitude, double latitude, string commune)
@@ -28,23 +28,24 @@ namespace Association
 			get { return idStation; }
 		}
 
-		public void AjouterPrecedente(Station s)
-		{
-			precedente = s;
-		}
+        public string NomStation
+        {
+            get { return nomStation; }
+        }
+        public double Longitude
+        {
+            get { return longitude; }
+        }
+        public double Latitude
+        {
+            get { return latitude; }
+        }
 
-		public void AjouterSuivante(Station s)
+        public override string ToString()
 		{
-			suivante = s;
-		}
-
-		public override string ToString()
-		{
-			if (precedente == null) { precedente.nomStation = "Terminus"; }
-			if (suivante == null) { suivante.nomStation = "Terminus"; }
-
-			string s = nomStation + " - Ligne " + ligneMetro + " (" + longitude + ", " + latitude + ")";
-			s = s + "Précédente : " + precedente.nomStation + " ; Suivante : " + suivante.nomStation;
+			string s = "" + idStation;
+			//string s = nomStation + " - Ligne " + ligneMetro + " (" + longitude + ", " + latitude + ")";
+			//s = s + "Précédente : " + precedente.nomStation + " ; Suivante : " + suivante.nomStation;
 			return s;
 		}
 

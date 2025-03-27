@@ -53,7 +53,17 @@ namespace Association
 			return false;
 		}
 
-		public Lien<T> IdentifierLien(Noeud<T> noeud1, Noeud<T> noeud2)
+		public void AfficherNoeuds() // affiche l'ensemble des noeuds du graphe
+		{
+			foreach (Noeud<T> noeud in noeuds) { Console.WriteLine(noeud); }
+		}
+
+        public void AfficherLiens() // affiche l'ensemble des liens du graphe
+        {
+            foreach (Lien<T> lien in liens) { Console.WriteLine(lien); }
+        }
+
+        public Lien<T> IdentifierLien(Noeud<T> noeud1, Noeud<T> noeud2)
 		// trouver un lien dans le graphe entre deux sommets données
 		{
 			List<Lien<T>> liensNoeud1 = LiensParNoeud(noeud1);
