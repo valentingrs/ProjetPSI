@@ -31,12 +31,25 @@ namespace Association
 			set { oriente = value; }
 		}
 
+		/// Méthodes pour manipuler des éléments du graphe
 		public void AjouterSommet(Noeud<T> sommet)
 		{
 			if (!ContientSommet(sommet)) { noeuds.Add(sommet); }
 		}
 
-		public bool ContientSommet(Noeud<T> sommetRecherche)
+        public void AjouterLien(Lien<T> lien)
+        {
+            if (!ContientLien(lien)) { liens.Add(lien); lien.Noeud1.AjouterVoisin(lien.Noeud2); }
+
+            if (oriente == false)
+            {
+                Lien<T> reciproque = new Lien<T>(lien.Noeud2, lien.Noeud1);
+                if (!ContientLien(reciproque)) { liens.Add(reciproque); reciproque.Noeud1.AjouterVoisin(reciproque.Noeud2); }
+            }
+        }
+
+
+        public bool ContientSommet(Noeud<T> sommetRecherche)
 		{
 			foreach (Noeud<T> sommet in noeuds)
 			{
@@ -63,6 +76,19 @@ namespace Association
             foreach (Lien<T> lien in liens) { Console.WriteLine(lien); }
         }
 
+        public Noeud<T> IdentifierNoeud(T nom)
+		// identifie un noeud à partir d'un élément de type rentré (une station par exemple)
+        {
+            Noeud<T> noeudTrouve;
+            foreach (Noeud<T> noeud in this.Noeuds)
+            {
+                if (noeud.Nom.Equals(nom)) { return noeud; }
+            }
+            Console.WriteLine("Pas de noeud trouve.");
+            noeudTrouve = null;
+            return noeudTrouve;
+        }
+
         public Lien<T> IdentifierLien(Noeud<T> noeud1, Noeud<T> noeud2)
 		// trouver un lien dans le graphe entre deux sommets données
 		{
@@ -78,32 +104,8 @@ namespace Association
 			return lienReturn;
 		}
 
-		public Noeud<T> IdentifierNoeud(T nom)
-		{
-			Noeud<T> noeudTrouve;
-			foreach(Noeud<T> noeud in this.Noeuds)
-			{
-				if (noeud.Nom.Equals(nom)) {  return noeud; }
-			}
-			Console.WriteLine("Pas de noeud trouve.");
-            noeudTrouve = null;
-			return noeudTrouve;
-		}
-
-
-
-		public void AjouterLien(Lien<T> lien)
-		{
-			if (!ContientLien(lien)) { liens.Add(lien); lien.Noeud1.AjouterVoisin(lien.Noeud2); }
-
-			if (oriente == false)
-			{
-				Lien<T> reciproque = new Lien<T>(lien.Noeud2, lien.Noeud1);
-				if (!ContientLien(reciproque)) { liens.Add(reciproque); reciproque.Noeud1.AjouterVoisin(reciproque.Noeud2); }
-			}
-		}
-
 		public List<Lien<T>> LiensParNoeud(Noeud<T> noeud)
+		// retourne les liens partant de ce noeud
 		{
 			List<Lien<T>> liensNoeud = new List<Lien<T>> ();
 			foreach (Lien<T> lien in liens)
@@ -116,6 +118,7 @@ namespace Association
 			return liensNoeud;
 		}
 
+		/// Affichage du graphe
 		public Dictionary<Noeud<T>, List<Noeud<T>>> ListeAdjacence()
 		{
 			Dictionary<Noeud<T>, List<Noeud<T>>> listeAdj = new Dictionary<Noeud<T>, List<Noeud<T>>>();
@@ -137,6 +140,7 @@ namespace Association
 			}
 		}
 
+		/// Exploitation du graphe : parcours, distances, connexité, ...
 		public void ParcoursEnLargeur(Noeud<T> depart)
 		{
 			Queue<Noeud<T>> file = new Queue<Noeud<T>>(); // file de sommets FIFO
