@@ -3,22 +3,12 @@ using static Association.Graphique;
 using OfficeOpenXml;
 using System.Collections.Generic;
 
-
 namespace Association
 {
     internal class Program
     {
 
-        public static Station IdentifierStationId(List<Station> stations, int id)
-        {
-            Station identifiee;
-            foreach (Station station in stations)
-            {
-                if (station.IdStation == id) { identifiee = station; return identifiee; }
-            }
-            Console.WriteLine("Pas de station ayant ce nom dans la liste");
-            return null;
-        }
+        
 
         //station de métro
         static public Graphe<Station> LireStationMetro(string filename) // extrait du fichier MetroParis toutes les stations de métro de Paris
@@ -59,7 +49,7 @@ namespace Association
                 {
 
                     string stat = worksheet2.Cells[row, 1].Text;
-                    Station statActuelle = IdentifierStationId(stationsParis, Int32.Parse(stat));
+                    Station statActuelle = GrapheStation.IdentifierStationId(stationsParis, Int32.Parse(stat));
                     Noeud<Station> noeudActuel = grapheParis.IdentifierNoeud(statActuelle);
 
 
