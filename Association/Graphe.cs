@@ -31,7 +31,7 @@ namespace Association
 			set { oriente = value; }
 		}
 
-		/// Méthodes pour manipuler des éléments du graphe
+		/// Méthodes de base pour manipuler des éléments du graphe
 		public void AjouterSommet(Noeud<T> sommet)
 		{
 			if (!ContientSommet(sommet)) { noeuds.Add(sommet); }
@@ -76,6 +76,12 @@ namespace Association
             foreach (Lien<T> lien in liens) { Console.WriteLine(lien); }
         }
 
+		public int Taille()
+		{
+			return noeuds.Count();
+		}
+
+		/// Méthodes plus approfondies
         public Noeud<T> IdentifierNoeud(T nom)
 		// identifie un noeud à partir d'un élément de type rentré (une station par exemple)
         {
@@ -92,16 +98,16 @@ namespace Association
         public Lien<T> IdentifierLien(Noeud<T> noeud1, Noeud<T> noeud2)
 		// trouver un lien dans le graphe entre deux sommets données
 		{
+			//Console.WriteLine("Identifier le lien entre : " + noeud1 + " et " + noeud2);
 			List<Lien<T>> liensNoeud1 = LiensParNoeud(noeud1);
-			Lien<T> lienReturn = new Lien<T>(null, null);
+			//foreach(Lien<T> lien in liensNoeud1) { Console.Write(lien + " ; "); }
 			foreach (Lien<T> lien in liensNoeud1)
 			{
-				lienReturn = lien;
-				if (lien.Noeud2 == noeud2) { return lienReturn; }
+				//Console.WriteLine("\nlien : " + lien);
+				//Console.WriteLine(lien.Noeud2 + " - noeud de base : " + noeud2 + " et égalité ? " + (lien.Noeud2 == noeud2));
+				if (lien.Noeud2 == noeud2) { return lien; }
 			}
-
-			Console.WriteLine("Pas de lien trouvé");
-			return lienReturn;
+			return null;
 		}
 
 		public List<Lien<T>> LiensParNoeud(Noeud<T> noeud)

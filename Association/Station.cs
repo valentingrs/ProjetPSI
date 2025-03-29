@@ -43,7 +43,7 @@ namespace Association
 
         public override string ToString()
 		{
-			string s = "" + idStation;
+			string s = "" + nomStation;
 			//string s = nomStation + " - Ligne " + ligneMetro + " (" + longitude + ", " + latitude + ")";
 			//s = s + "Précédente : " + precedente.nomStation + " ; Suivante : " + suivante.nomStation;
 			return s;
