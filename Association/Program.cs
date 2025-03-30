@@ -81,12 +81,6 @@ namespace Association
             Graphe<Station> metroParis = LireStationMetro("MetroParis.xlsx");
 
             DessinerGrapheStation(metroParis, "metro.png");
-            string cheminImage = Path.GetFullPath("metro.png");
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = cheminImage,
-                UseShellExecute = true  // Permet d'utiliser l'application par défaut pour ouvrir l'image
-            });
 
             Station s1 = metroParis.Noeuds[2].Nom;
             Station s2 = metroParis.Noeuds[5].Nom;
@@ -112,12 +106,20 @@ namespace Association
             g.AjouterLien(new Lien<int>(n4, n1, 2));
             g.AjouterLien(new Lien<int>(n5, n4, 6));
 
-            FloydWarshall(g, 1, 4);
+            Graphe<int> h = new Graphe<int>(false);
+            Noeud<int> h1 = new Noeud<int>(1); h.AjouterSommet(h1);
+            Noeud<int> h2 = new Noeud<int>(2); h.AjouterSommet(h2);
+            Noeud<int> h3 = new Noeud<int>(3); h.AjouterSommet(h3);
+            h.AjouterLien(new Lien<int>(h1, h2));
+            h.AjouterLien(new Lien<int>(h1, h3));
+            Console.WriteLine(h.Pondere());
+            DessinerGraphe(h, "graphe.png");
+            //FloydWarshall(g, 1, 4);
         }
 
         public static void Main(string[] args)
         {
-            MetroParis();
+            TestFloydWarshallInt();
         }
     }
 }

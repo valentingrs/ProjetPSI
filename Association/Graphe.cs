@@ -6,12 +6,14 @@ namespace Association
 		private List<Noeud<T>> noeuds;
 		private List<Lien<T>> liens;
 		private bool oriente;
+		private bool pondere;
 
 		public Graphe(bool oriente)
 		{
             noeuds = new List<Noeud<T>>();
 			liens = new List<Lien<T>> ();
 			this.oriente = oriente;
+			this.pondere = Pondere();
 		}
 
 		public List<Noeud<T>> Noeuds
@@ -31,6 +33,14 @@ namespace Association
 			set { oriente = value; }
 		}
 
+		public bool Pondere()
+		{
+			foreach (Lien<T> lien in this.liens)
+			{
+				if (lien.Poids != null) { return true; }
+			}
+			return false;
+		}
 		/// Méthodes de base pour manipuler des éléments du graphe
 		public void AjouterSommet(Noeud<T> sommet)
 		{
@@ -98,13 +108,9 @@ namespace Association
         public Lien<T> IdentifierLien(Noeud<T> noeud1, Noeud<T> noeud2)
 		// trouver un lien dans le graphe entre deux sommets données
 		{
-			//Console.WriteLine("Identifier le lien entre : " + noeud1 + " et " + noeud2);
 			List<Lien<T>> liensNoeud1 = LiensParNoeud(noeud1);
-			//foreach(Lien<T> lien in liensNoeud1) { Console.Write(lien + " ; "); }
 			foreach (Lien<T> lien in liensNoeud1)
 			{
-				//Console.WriteLine("\nlien : " + lien);
-				//Console.WriteLine(lien.Noeud2 + " - noeud de base : " + noeud2 + " et égalité ? " + (lien.Noeud2 == noeud2));
 				if (lien.Noeud2 == noeud2) { return lien; }
 			}
 			return null;
@@ -145,6 +151,8 @@ namespace Association
 				Console.WriteLine($"{entry.Key.Nom} -> {string.Join(", ", entry.Value.Select(s => s.Nom))}");
 			}
 		}
+
+		
 
 		/// Exploitation du graphe : parcours, distances, connexité, ...
 		public void ParcoursEnLargeur(Noeud<T> depart)

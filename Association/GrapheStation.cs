@@ -5,7 +5,7 @@ namespace Association
     internal class GrapheStation
     {
         /// Fonctions supplémentaires pour manipuler le graphe des stations Graphe<Station>
-        /// Car il demande des méthodes particulières qui ne peuvent être traitées pour des types générique
+        /// Car il demande des méthodes particulières qui ne peuvent pas être traitées pour des types générique
 
         public static Station IdentifierStationId(List<Station> stations, int id) // identifier une station à partir de son identifiant
         {
@@ -88,6 +88,13 @@ namespace Association
                 {
                     data.SaveTo(stream);
                 }
+
+                string cheminImage = Path.GetFullPath(fichierImage);
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = cheminImage,
+                    UseShellExecute = true  // Permet d'utiliser l'application par défaut pour ouvrir l'image
+                });
             }
         }
 

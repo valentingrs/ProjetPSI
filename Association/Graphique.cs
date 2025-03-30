@@ -5,7 +5,24 @@ namespace Association
 {
 	internal class Graphique
 	{
+
         static public void DessinerGraphe<T>(Graphe<T> graphe, string fichierImage)
+        {
+            if (graphe.Oriente == true)
+            {
+                DessinerGrapheOriente(graphe, fichierImage);
+            }
+            else { DessinerGrapheNonOriente(graphe, fichierImage); }
+
+            string cheminImage = Path.GetFullPath(fichierImage);
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = cheminImage,
+                UseShellExecute = true  // Permet d'utiliser l'application par défaut pour ouvrir l'image
+            });
+        }
+
+        static public void DessinerGrapheNonOriente<T>(Graphe<T> graphe, string fichierImage)
         {
             const int largeurImage = 1000;
             const int hauteurImage = 1000;
@@ -177,6 +194,8 @@ namespace Association
                 {
                     data.SaveTo(stream);
                 }
+
+                
             }
         }
 
@@ -204,7 +223,5 @@ namespace Association
             canvas.DrawLine(fin, p1, paint);
             canvas.DrawLine(fin, p2, paint);
         }
-
-
     }
 }

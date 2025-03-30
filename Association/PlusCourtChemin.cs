@@ -90,5 +90,6 @@
             foreach (T elem in chemin) { Console.Write(elem + ", "); }
         }
 
+
     }
 }
