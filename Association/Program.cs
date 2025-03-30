@@ -106,14 +106,16 @@ namespace Association
             g.AjouterLien(new Lien<int>(n4, n1, 2));
             g.AjouterLien(new Lien<int>(n5, n4, 6));
 
-            Graphe<int> h = new Graphe<int>(false);
-            Noeud<int> h1 = new Noeud<int>(1); h.AjouterSommet(h1);
-            Noeud<int> h2 = new Noeud<int>(2); h.AjouterSommet(h2);
-            Noeud<int> h3 = new Noeud<int>(3); h.AjouterSommet(h3);
-            h.AjouterLien(new Lien<int>(h1, h2));
-            h.AjouterLien(new Lien<int>(h1, h3));
-            Console.WriteLine(h.Pondere());
-            DessinerGraphe(h, "graphe.png");
+            Console.WriteLine(g.Pondere());
+            double?[,] matriceAdj = g.MatriceAdjacence();
+            for (int i = 0; i < matriceAdj.GetLength(0); i++)
+            {
+                for (int j = 0; j < matriceAdj.GetLength(1); j++)
+                {
+                    Console.Write(matriceAdj[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
             //FloydWarshall(g, 1, 4);
         }
 

@@ -6,17 +6,16 @@ namespace Association
 		private List<Noeud<T>> noeuds;
 		private List<Lien<T>> liens;
 		private bool oriente;
-		private bool pondere;
 
 		public Graphe(bool oriente)
 		{
             noeuds = new List<Noeud<T>>();
 			liens = new List<Lien<T>> ();
 			this.oriente = oriente;
-			this.pondere = Pondere();
 		}
 
-		public List<Noeud<T>> Noeuds
+        #region Proprietes
+        public List<Noeud<T>> Noeuds
 		{
 			get { return noeuds; }
 			set { noeuds = value; }
@@ -33,16 +32,11 @@ namespace Association
 			set { oriente = value; }
 		}
 
-		public bool Pondere()
-		{
-			foreach (Lien<T> lien in this.liens)
-			{
-				if (lien.Poids != null) { return true; }
-			}
-			return false;
-		}
-		/// Méthodes de base pour manipuler des éléments du graphe
-		public void AjouterSommet(Noeud<T> sommet)
+        #endregion
+
+        #region Methodes de base
+        /// Méthodes de base pour manipuler des éléments du graphe
+        public void AjouterSommet(Noeud<T> sommet)
 		{
 			if (!ContientSommet(sommet)) { noeuds.Add(sommet); }
 		}
@@ -75,8 +69,16 @@ namespace Association
 			}
 			return false;
 		}
+        public bool Pondere()
+        {
+            foreach (Lien<T> lien in this.liens)
+            {
+                if (lien.Poids != null) { return true; }
+            }
+            return false;
+        }
 
-		public void AfficherNoeuds() // affiche l'ensemble des noeuds du graphe
+        public void AfficherNoeuds() // affiche l'ensemble des noeuds du graphe
 		{
 			foreach (Noeud<T> noeud in noeuds) { Console.WriteLine(noeud); }
 		}
@@ -90,8 +92,10 @@ namespace Association
 		{
 			return noeuds.Count();
 		}
+        #endregion
 
-		/// Méthodes plus approfondies
+        #region Methodes utiles
+        /// Méthodes plus approfondies
         public Noeud<T> IdentifierNoeud(T nom)
 		// identifie un noeud à partir d'un élément de type rentré (une station par exemple)
         {
@@ -130,8 +134,11 @@ namespace Association
 			return liensNoeud;
 		}
 
-		/// Affichage du graphe
-		public Dictionary<Noeud<T>, List<Noeud<T>>> ListeAdjacence()
+        #endregion
+
+        #region Affichage
+        /// Affichage du graphe
+        public Dictionary<Noeud<T>, List<Noeud<T>>> ListeAdjacence()
 		{
 			Dictionary<Noeud<T>, List<Noeud<T>>> listeAdj = new Dictionary<Noeud<T>, List<Noeud<T>>>();
 			foreach (Noeud<T> sommet in noeuds)
@@ -151,11 +158,36 @@ namespace Association
 				Console.WriteLine($"{entry.Key.Nom} -> {string.Join(", ", entry.Value.Select(s => s.Nom))}");
 			}
 		}
+        public double?[,] MatriceAdjacence()
+        {
+            // Stocke le nombre de noeud de G dans V
+            int V = noeuds.Count;
 
-		
+            double?[,] matrice_adjacence = new double?[V, V]; // initialise une matrice de double?
 
-		/// Exploitation du graphe : parcours, distances, connexité, ...
-		public void ParcoursEnLargeur(Noeud<T> depart)
+            int i = 0;
+			bool estPondere = Pondere();
+
+            foreach (Noeud<T> n1 in noeuds)
+            {
+                int j = 0;
+                foreach (Noeud<T> n2 in noeuds)
+                {
+					Lien<T> lien = IdentifierLien(n1, n2);
+                    matrice_adjacence[i, j] = (lien != null) ? (estPondere ? lien.Poids : 1) : 0;
+                    
+                    j++;
+                }
+                i++;
+            }
+            return matrice_adjacence;
+        }
+        #endregion
+
+
+        #region Exploitation graphe
+        /// Exploitation du graphe : parcours, distances, connexité, ...
+        public void ParcoursEnLargeur(Noeud<T> depart)
 		{
 			Queue<Noeud<T>> file = new Queue<Noeud<T>>(); // file de sommets FIFO
 
@@ -235,5 +267,6 @@ namespace Association
 			int sommetsVisites = visite.Values.Count(v => v == true); 
 			return sommetsVisites == noeuds.Count;
 		}
-	}
+        #endregion
+    }
 }
