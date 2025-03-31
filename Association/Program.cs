@@ -43,6 +43,7 @@ namespace Association
                     grapheParis.AjouterSommet(noeudStation); // on ajoute la station au plan du métro parisien
                 }
 
+                Console.WriteLine(rowCount2);
                 for (int row = 2; row <= rowCount2; row++)
                 {
 
@@ -50,7 +51,7 @@ namespace Association
                     Station statActuelle = IdentifierStationId(stationsParis, Int32.Parse(stat));
                     Noeud<Station> noeudActuel = grapheParis.IdentifierNoeud(statActuelle);
 
-
+                    //Console.WriteLine(statActuelle);
                     string prec = worksheet2.Cells[row, 3].Text;
                     if (prec != "")
                     {
@@ -60,6 +61,13 @@ namespace Association
                         Lien<Station> lienPrecActuelle = new Lien<Station>(noeudPrec, noeudActuel, temps);
                         grapheParis.AjouterLien(lienPrecActuelle);
 
+                        string bidirectionnel = worksheet2.Cells[row, 7].Text;
+                        if (bidirectionnel == "1")
+                        {
+                            Lien<Station> lienInverse = new Lien<Station>(noeudActuel, noeudPrec, temps);
+                            grapheParis.AjouterLien(lienInverse);
+                        }
+                        
                     }
 
                     string suiv = worksheet2.Cells[row, 4].Text;
@@ -70,6 +78,13 @@ namespace Association
                         int temps = Int32.Parse(worksheet2.Cells[row, 6].Text);
                         Lien<Station> lienActuelleSuiv = new Lien<Station>(noeudActuel, noeudSuiv, temps);
                         grapheParis.AjouterLien(lienActuelleSuiv);
+
+                        string bidirectionnel = worksheet2.Cells[row, 7].Text;
+                        if (bidirectionnel == "1")
+                        {
+                            Lien<Station> lienInverse = new Lien<Station>(noeudSuiv, noeudActuel, temps);
+                            grapheParis.AjouterLien(lienInverse);
+                        }
                     }
                 }
                 return grapheParis;
@@ -82,8 +97,8 @@ namespace Association
 
             DessinerGrapheStation(metroParis, "metro.png");
 
-            Station s1 = metroParis.Noeuds[5].Nom;
-            Station s2 = metroParis.Noeuds[1].Nom;
+            Station s1 = metroParis.Noeuds[134].Nom;
+            Station s2 = metroParis.Noeuds[25].Nom;
             FloydWarshall(metroParis, s1, s2);
         }
 
