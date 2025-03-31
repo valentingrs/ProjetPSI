@@ -82,9 +82,8 @@ namespace Association
 
             DessinerGrapheStation(metroParis, "metro.png");
 
-            Station s1 = metroParis.Noeuds[2].Nom;
-            Station s2 = metroParis.Noeuds[5].Nom;
-
+            Station s1 = metroParis.Noeuds[5].Nom;
+            Station s2 = metroParis.Noeuds[1].Nom;
             FloydWarshall(metroParis, s1, s2);
         }
 
@@ -121,7 +120,7 @@ namespace Association
 
         public static void Main(string[] args)
         {
-            TestFloydWarshallInt();
+            MetroParis();
         }
     }
 }
