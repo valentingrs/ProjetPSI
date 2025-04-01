@@ -22,7 +22,7 @@ namespace Association
             });
         }
 
-        static public void DessinerGrapheNonOriente<T>(Graphe<T> graphe, string fichierImage)
+        static private void DessinerGrapheNonOriente<T>(Graphe<T> graphe, string fichierImage)
         {
             const int largeurImage = 1000;
             const int hauteurImage = 1000;
@@ -104,7 +104,7 @@ namespace Association
             }
         }
 
-        static public void DessinerGrapheOriente<T>(Graphe<T> graphe, string fichierImage)
+        static private void DessinerGrapheOriente<T>(Graphe<T> graphe, string fichierImage)
         {
             const int largeurImage = 1000;
             const int hauteurImage = 1000;

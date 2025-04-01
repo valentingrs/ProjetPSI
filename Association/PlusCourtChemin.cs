@@ -86,11 +86,12 @@
                 chemin.Insert(0, graphe.Noeuds[depInt].Nom);
             }
 
-            Console.WriteLine("Chemin le plus court entre " + dep + " et " + arr + " : ");
-            foreach (T elem in chemin) { Console.Write(elem + ", "); }
+            Console.WriteLine("Itinéraire le plus court entre " + dep + " et " + arr + " : ");
+            foreach (T elem in chemin) { Console.WriteLine(elem); }
+            Console.WriteLine("Temps total : " + plusCourts[depInt, arrInt] + " minutes");
         }
 
-        public void Dijkstra<T>(Graphe<T> G, Noeud<T> depart)
+        public static void Dijkstra<T>(Graphe<T> G, Noeud<T> depart, Noeud<T> arrivee)
         {
             if (!G.Noeuds.Contains(depart)) return; // Vérifie que le départ est dans le graphe
 
@@ -142,7 +143,33 @@
                     }
                 }
             }
+
+            // Affichage du chemin le plus court
+            if (Dist[arrivee] == double.PositiveInfinity)
+            {
+                Console.WriteLine($"Aucun chemin trouvé entre {depart} et {arrivee}.");
+                return;
+            }
+
+            List<Noeud<T>> chemin = new List<Noeud<T>>();
+            Noeud<T> actuel = arrivee;
+
+            while (!(actuel is null))
+            {
+                chemin.Insert(0, actuel);
+                actuel = Pred[actuel];
+            }
+
+            Console.WriteLine("\nChemin le plus court :");
+            
+            foreach (Noeud<T> noeud in chemin)
+            {
+                Console.WriteLine(noeud);
+            }
+
+            Console.WriteLine($"Distance totale: {Dist[arrivee]}");
         }
+
         public void Bellman_Ford<T>(Graphe<T> G, Noeud<T> depart)
         {
             if (!G.Noeuds.Contains(depart)) return; // Vérifie que le noeud de départ est dans le graphe

@@ -43,16 +43,21 @@ namespace Association
 
 		public bool Equals(Noeud<T> sommet2)
 		{
-			return (nom != null && nom.Equals(sommet2.nom));
-		}
+            if (sommet2 is null) return false;
+            return (nom != null && nom.Equals(sommet2.nom));
+        }
 
-		public static bool operator ==(Noeud<T> s1, Noeud<T> s2)
+        public static bool operator ==(Noeud<T> s1, Noeud<T> s2)
 		{
+            if (ReferenceEquals(s1, s2)) return true;
+            if (s1  is null || s2 is null) return false;	
 			return s1.Equals(s2);
 		}
 
 		public static bool operator !=(Noeud<T> s1, Noeud<T> s2)
 		{
+			if (s1 is null) { return false; }
+			if (s2 is null) { return false; }
 			return !(s1 == s2);
 		}
 

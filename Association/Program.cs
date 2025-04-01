@@ -37,27 +37,25 @@ namespace Association
                         double.Parse(worksheet1.Cells[row, 4].Text, CultureInfo.InvariantCulture),
                         double.Parse(worksheet1.Cells[row, 5].Text, CultureInfo.InvariantCulture),
                         worksheet1.Cells[row, 6].Text);
-
                     noeudStation = new Noeud<Station>(s); // "conversion" de la station traitée en noeud
                     stationsParis.Add(s); // ajout de la station à la liste des stations de Paris
                     grapheParis.AjouterSommet(noeudStation); // on ajoute la station au plan du métro parisien
                 }
 
-                Console.WriteLine(rowCount2);
                 for (int row = 2; row <= rowCount2; row++)
                 {
 
                     string stat = worksheet2.Cells[row, 1].Text;
-                    Station statActuelle = IdentifierStationId(stationsParis, Int32.Parse(stat));
+                    Station statActuelle = IdentifierStationId(stationsParis, int.Parse(stat));
                     Noeud<Station> noeudActuel = grapheParis.IdentifierNoeud(statActuelle);
-
+                    
                     //Console.WriteLine(statActuelle);
                     string prec = worksheet2.Cells[row, 3].Text;
                     if (prec != "")
                     {
-                        Station statPrec = IdentifierStationId(stationsParis, Int32.Parse(prec));
+                        Station statPrec = IdentifierStationId(stationsParis, int.Parse(prec));
                         Noeud<Station> noeudPrec = grapheParis.IdentifierNoeud(statPrec);
-                        int temps = Int32.Parse(worksheet2.Cells[row, 5].Text);
+                        int temps = int.Parse(worksheet2.Cells[row, 5].Text);
                         Lien<Station> lienPrecActuelle = new Lien<Station>(noeudPrec, noeudActuel, temps);
                         grapheParis.AjouterLien(lienPrecActuelle);
 
@@ -91,18 +89,41 @@ namespace Association
             }
         }
 
+        public static Station TrouverStationParNom(Graphe<Station> graphe, string nomStation)
+        {
+            foreach (Noeud<Station> noeud in graphe.Noeuds)
+            {
+                if (noeud.Nom.NomStation.Equals(nomStation, StringComparison.OrdinalIgnoreCase))
+                {
+                    return noeud.Nom;
+                }
+            }
+            return null;
+        }
+
         static public void MetroParis()
         {
             Graphe<Station> metroParis = LireStationMetro("MetroParis.xlsx");
 
-            DessinerGrapheStation(metroParis, "metro.png");
+            //DessinerGrapheStation(metroParis, "metro.png");
 
-            Station s1 = metroParis.Noeuds[134].Nom;
-            Station s2 = metroParis.Noeuds[25].Nom;
-            FloydWarshall(metroParis, s1, s2);
+            Console.Write("Entrer une station de départ : "); string s1 = Console.ReadLine();
+            Console.Write("Entrer une station d'arrivée : "); string s2 = Console.ReadLine();
+
+            while (s1 != "")
+            {
+                Station stat1 = TrouverStationParNom(metroParis, s1);
+                Station stat2 = TrouverStationParNom(metroParis, s2);
+                Dijkstra(metroParis, metroParis.IdentifierNoeud(stat1), metroParis.IdentifierNoeud(stat2));
+
+                Console.Write("Entrer une station de départ : "); s1 = Console.ReadLine();
+                Console.Write("Entrer une station d'arrivée : "); s2 = Console.ReadLine();
+            }
+            
+
         }
 
-        static public void TestFloydWarshallInt()
+        static public void GrapheSimpleTest()
         {
             Graphe<int> g = new Graphe<int>(true);
             Noeud<int> n1 = new Noeud<int>(1); g.AjouterSommet(n1);
@@ -112,11 +133,11 @@ namespace Association
             Noeud<int> n5 = new Noeud<int>(5); g.AjouterSommet(n5);
             g.AjouterLien(new Lien<int>(n1, n2, 3));
             g.AjouterLien(new Lien<int>(n1, n3, 8));
-            g.AjouterLien(new Lien<int>(n1, n5, -4));
+            g.AjouterLien(new Lien<int>(n1, n5, 4));
             g.AjouterLien(new Lien<int>(n2, n4, 1));
             g.AjouterLien(new Lien<int>(n2, n5, 7));
             g.AjouterLien(new Lien<int>(n3, n2, 4));
-            g.AjouterLien(new Lien<int>(n4, n3, -5));
+            g.AjouterLien(new Lien<int>(n4, n3, 5));
             g.AjouterLien(new Lien<int>(n4, n1, 2));
             g.AjouterLien(new Lien<int>(n5, n4, 6));
 
@@ -130,12 +151,17 @@ namespace Association
                 }
                 Console.WriteLine();
             }
+
+            DessinerGraphe(g, "graphe.png");
+
+            //Dijkstra(g, g.Noeuds[2], g.Noeuds[4]);
             //FloydWarshall(g, 1, 4);
         }
 
         public static void Main(string[] args)
         {
             MetroParis();
+            //GrapheSimpleTest();
         }
     }
 }
