@@ -127,13 +127,13 @@ namespace Association
         #endregion
 
         #region Cuisinier
-        public static void AjouterCuisinier(bool VeuxEtreCuisinier, int IDTiers, int IDPlat, MySqlConnection conn)
+        public static void AjouterCuisinier(bool VeuxEtreCuisinier, int IDTiers, MySqlConnection conn)
 		{
-			if (VeuxEtreCuisinier && IDPlat != 0)
+			if (VeuxEtreCuisinier)
 			{
 				try
 				{
-					string query = $"INSERT INTO Cuisinier (IDTiers, IDPlat) VALUES ({IDTiers}, {IDPlat});";
+					string query = $"INSERT INTO Cuisinier VALUES ({IDTiers});";
 
 					using (MySqlCommand cmd = new MySqlCommand(query, conn))
 					{
@@ -171,7 +171,7 @@ namespace Association
         }
 		#endregion
 
-		static void FairePlat(bool EtreCuisinier, MySqlConnection conn, int IDPlat, string TypePlat, DateTime DateFabrication, DateTime DatePeremption, string Nationalite, string Regime, string Ingredients, float PrixPlat, int NombrePersonnes)
+		public static void FairePlat(bool EtreCuisinier, MySqlConnection conn, int IDPlat, string TypePlat, DateTime DateFabrication, DateTime DatePeremption, string Nationalite, string Regime, string Ingredients, float PrixPlat, int NombrePersonnes, int idCuisinier)
 		{
 			MySqlTransaction transaction = conn.BeginTransaction();
 
@@ -180,7 +180,7 @@ namespace Association
 				try
 				{
 					string query = $"INSERT INTO Plat (IDPlat, TypePlat, DateFabrication, DatePeremption, Nationalite, Regime, Ingredients, PrixPlat, NombrePersonnes) " +
-								   $"VALUES ({IDPlat}, '{TypePlat}', '{DateFabrication:yyyy-MM-dd}', '{DatePeremption:yyyy-MM-dd}', '{Nationalite}', '{Regime}', '{Ingredients}', {PrixPlat}, {NombrePersonnes});";
+								   $"VALUES ({IDPlat}, '{TypePlat}', '{DateFabrication:yyyy-MM-dd}', '{DatePeremption:yyyy-MM-dd}', '{Nationalite}', '{Regime}', '{Ingredients}', {PrixPlat}, {NombrePersonnes}, {idCuisinier});";
 
 					using (MySqlCommand cmd = new MySqlCommand(query, conn, transaction))
 					{

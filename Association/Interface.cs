@@ -151,9 +151,10 @@ namespace Association
             Console.WriteLine("Que voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
             Console.WriteLine("1 - Ajouter un cuisinier");
             Console.WriteLine("2 - Supprimer un cuisinier");
+			Console.WriteLine("3 - En tant que cuisinier, ajouter un plat");
             Console.Write("\nChoix : ");
             string choix = Console.ReadLine();
-            while (choix != "1" && choix != "2" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+            while (choix != "1" && choix != "2" && choix != "3" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
 
             while (choix != "r")
             {
@@ -170,7 +171,7 @@ namespace Association
 						clientExiste = Existe(conn, "Tiers", "IDTiers", id);
 
 					}
-                    AjouterCuis(true, id, conn);
+                    AjouterCuisinier(true, id, conn);
                 }
 
                 if (choix == "2")
@@ -189,12 +190,45 @@ namespace Association
                     SupprimerClient(conn, "Client", id);
                 }
 
+                if (choix == "3")
+                {
+                    Console.WriteLine("\nConfection d'un plat : ");
+                    Console.Write("Entrer l'id du compte cuisinier: "); int id = Convert.ToInt32(Console.ReadLine());
+
+                    bool clientExiste = Existe(conn, "Cuisinier", "IDTiers", id);
+                    while (clientExiste == false)
+                    {
+                        Console.WriteLine("Compte cuisinier inexistant, rentrer un nouvel id");
+                        Console.Write("Entrer l'id du compte Cuisinier : "); id = Convert.ToInt32(Console.ReadLine());
+                        clientExiste = Existe(conn, "Cuisinier", "IDTiers", id);
+                    }
+
+                    ModulePlat(conn, id);
+                }
+
 
                 Console.Write("\nChoix : ");
                 choix = Console.ReadLine();
-                while (choix != "1" && choix != "2" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+                while (choix != "1" && choix != "2" && choix != "3" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
             }
             RetourMenu(conn);
+        }
+
+		static void ModulePlat(MySqlConnection conn, int idCuisinier)
+		{
+			Console.WriteLine("Ajout d'un plat");
+			Console.Write("Id du plat : "); int idplat = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Type du plat : "); string type = Console.ReadLine();
+            Console.Write("Date de fabrication du plat (JJ-MM-AAAA) : "); DateTime fabrication = Convert.ToDateTime(Console.ReadLine());
+            Console.Write("Date de peremption du plat (JJ-MM-AAAA) : "); DateTime peremption = Convert.ToDateTime(Console.ReadLine());
+            Console.Write("nationalité du plat : "); string natio = Console.ReadLine();
+            Console.Write("ingredients du plat : "); string ingredients = Console.ReadLine();
+            Console.Write("regime du plat : "); string regime = Console.ReadLine();
+            Console.Write("prix du plat : "); float prix = Convert.ToInt64(Console.ReadLine());
+
+            Console.Write("Nombre de personnes pour le plat : "); int nbPersonnes = Convert.ToInt32(Console.ReadLine());
+
+            FairePlat(true, conn, idplat, type, fabrication, peremption, natio, regime, ingredients, prix, nbPersonnes, idCuisinier);
         }
 
 		static void ModuleCommande(MySqlConnection conn)
