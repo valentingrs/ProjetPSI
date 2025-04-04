@@ -4,8 +4,10 @@
 	{
 		/// Ficher contenant des algorithmes de recherche de plus court chemin
 		/// Comparaison des algorithmes
-        public static void FloydWarshall<T>(Graphe<T> graphe, T dep, T arr)
+        public static void FloydWarshall<T>(Graphe<T> graphe, Noeud<T> dep, Noeud<T> arr)
         {
+            if (!graphe.Noeuds.Contains(dep)) return; // Vérifie que le départ est dans le graphe
+            if (!graphe.Noeuds.Contains(arr)) return;
             const int inf = int.MaxValue;
 
             // Initialisation matrice des plus courts chemins
@@ -19,6 +21,7 @@
                 {
                     Noeud<T> noeud1 = graphe.Noeuds[i];
                     Noeud<T> noeud2 = graphe.Noeuds[j];
+                    
                     Lien<T> lien = graphe.IdentifierLien(noeud1, noeud2);
                     if (i == j)
                     {
@@ -69,8 +72,8 @@
                 dictionnaireIndices[graphe.Noeuds[i].Nom] = i;
             }
             List<T> chemin = new List<T>();
-            int depInt = dictionnaireIndices[dep];
-            int arrInt = dictionnaireIndices[arr];
+            int depInt = dictionnaireIndices[dep.Nom];
+            int arrInt = dictionnaireIndices[arr.Nom];
             if (predecesseurs[depInt, arrInt] == null)
             {
                 Console.WriteLine("Aucun chemin trouvé !");
@@ -94,6 +97,7 @@
         public static void Dijkstra<T>(Graphe<T> G, Noeud<T> depart, Noeud<T> arrivee)
         {
             if (!G.Noeuds.Contains(depart)) return; // Vérifie que le départ est dans le graphe
+            if (!G.Noeuds.Contains(arrivee)) return;
 
             int V = G.Noeuds.Count;
             Dictionary<Noeud<T>, double?> Dist = new Dictionary<Noeud<T>, double?>(); // Stocke les distances
@@ -143,7 +147,6 @@
                     }
                 }
             }
-
             // Affichage du chemin le plus court
             if (Dist[arrivee] == double.PositiveInfinity)
             {
@@ -167,12 +170,13 @@
                 Console.WriteLine(noeud);
             }
 
-            Console.WriteLine($"Distance totale: {Dist[arrivee]}");
+            Console.WriteLine($"Distance totale: {Dist[arrivee]} minutes");
         }
 
-        public void Bellman_Ford<T>(Graphe<T> G, Noeud<T> depart)
+        public static void Bellman_Ford<T>(Graphe<T> G, Noeud<T> depart, Noeud<T> arrivee)
         {
             if (!G.Noeuds.Contains(depart)) return; // Vérifie que le noeud de départ est dans le graphe
+            if (!G.Noeuds.Contains(arrivee)) return;
 
             int V = G.Noeuds.Count;
             Dictionary<Noeud<T>, double?> Dist = new Dictionary<Noeud<T>, double?>(); // Stocke les distances
@@ -216,6 +220,31 @@
                     throw new Exception("Cycle de poids négatif détecté !");
                 }
             }
+
+            // Affichage du chemin le plus court
+            if (Dist[arrivee] == double.PositiveInfinity)
+            {
+                Console.WriteLine($"Aucun chemin trouvé entre {depart} et {arrivee}.");
+                return;
+            }
+
+            List<Noeud<T>> chemin = new List<Noeud<T>>();
+            Noeud<T> actuel = arrivee;
+
+            while (!(actuel is null))
+            {
+                chemin.Insert(0, actuel);
+                actuel = Pred[actuel];
+            }
+
+            Console.WriteLine("\nChemin le plus court :");
+
+            foreach (Noeud<T> noeud in chemin)
+            {
+                Console.WriteLine(noeud);
+            }
+
+            Console.WriteLine($"Distance totale: {Dist[arrivee]}");
         }
     }
 }
