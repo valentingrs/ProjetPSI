@@ -32,7 +32,7 @@ namespace Association
 			
 		}
 
-		static bool Existe(MySqlConnection conn, string Table, string AttributElement, object element)
+		public static bool Existe(MySqlConnection conn, string Table, string AttributElement, object element)
 		{
 			bool ElementExiste = false;
 
@@ -79,9 +79,10 @@ namespace Association
 			}
 		}
 
-		#endregion
+        #endregion
 
-		static void AjouterClient(bool VeuxEtreClient, int IDTiers, MySqlConnection conn)
+        #region Cuisinier
+        public static void AjouterClient(bool VeuxEtreClient, int IDTiers, MySqlConnection conn)
 		{
 			if (VeuxEtreClient)
 			{
@@ -105,8 +106,28 @@ namespace Association
 				Console.WriteLine("Vous n'avez pas pu être ajouté à la table 'Client'.");
 			}
 		}
+		public static void SupprimerClient(MySqlConnection conn, string Table, int Identifiant)
+		{
+			try
+			{
+				string query = $"DELETE FROM {Table} WHERE ID{Table} = {Identifiant};";
 
-		static void AjouterCuisinier(bool VeuxEtreCuisinier, int IDTiers, int IDPlat, MySqlConnection conn)
+				using (MySqlCommand cmd = new MySqlCommand(query, conn))
+				{
+					cmd.ExecuteNonQuery();
+					Console.WriteLine("Client supprimé avec succès !");
+				}
+			}
+			catch (MySqlException e)
+			{
+				Console.WriteLine($"Erreur MySQL : {e.Message}");
+			}
+		}
+
+        #endregion
+
+        #region Cuisinier
+        public static void AjouterCuisinier(bool VeuxEtreCuisinier, int IDTiers, int IDPlat, MySqlConnection conn)
 		{
 			if (VeuxEtreCuisinier && IDPlat != 0)
 			{
@@ -130,6 +151,25 @@ namespace Association
 				Console.WriteLine("Vous n'avez pas pu être ajouté à la table 'Cuisinier'.");
 			}
 		}
+
+        public static void SupprimerCuisinier(MySqlConnection conn, string Table, int Identifiant)
+        {
+            try
+            {
+                string query = $"DELETE FROM {Table} WHERE ID{Table} = {Identifiant};";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.ExecuteNonQuery();
+                    Console.WriteLine("Cuisinier supprimé avec succès !");
+                }
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine($"Erreur MySQL : {e.Message}");
+            }
+        }
+		#endregion
 
 		static void FairePlat(bool EtreCuisinier, MySqlConnection conn, int IDPlat, string TypePlat, DateTime DateFabrication, DateTime DatePeremption, string Nationalite, string Regime, string Ingredients, float PrixPlat, int NombrePersonnes)
 		{

@@ -97,24 +97,105 @@ namespace Association
 
 			Console.WriteLine("Que voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
 			Console.WriteLine("1 - Ajouter un client");
-			Console.Write("\nChoix : ");
+            Console.WriteLine("2 - Supprimer un client");
+            Console.Write("\nChoix : ");
 			string choix = Console.ReadLine();
-			while (choix != "1" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
-			if (choix == "1")
-			{
-				
-			}
-			else
-			{
-                RetourMenu(conn);
+			while (choix != "1" && choix != "2" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+
+            while (choix != "r")
+            {
+                if (choix == "1")
+                {
+                    Console.WriteLine("\nCréation d'un client : ");
+                    Console.Write("Entrer l'id du compte Tiers : "); int idTiers = Convert.ToInt32(Console.ReadLine());
+                    
+					bool clientExiste = Existe(conn, "Tiers", "IDTiers", idTiers);
+					while (clientExiste == false)
+					{
+						Console.WriteLine("Compte tiers inexistant, rentrer un nouvel id");
+                        Console.Write("Entrer l'id du compte Tiers : "); idTiers = Convert.ToInt32(Console.ReadLine());
+                        clientExiste = Existe(conn, "Tiers", "IDTiers", idTiers);
+                    }
+
+					AjouterClient(true, idTiers, conn);
+                }
+
+                if (choix == "2")
+                {
+                    Console.WriteLine("\nSuppression d'un client : ");
+                    Console.Write("Entrer l'id du compte Tiers pour supprimer : "); int id = Convert.ToInt32(Console.ReadLine());
+
+                    bool clientExiste = Existe(conn, "Client", "IDTiers", id);
+                    while (clientExiste == false)
+                    {
+                        Console.WriteLine("Compte client inexistant, rentrer un nouvel id");
+                        Console.Write("Entrer l'id du compte Tiers : "); id = Convert.ToInt32(Console.ReadLine());
+                        clientExiste = Existe(conn, "Client", "IDTiers", id);
+                    }
+
+                    SupprimerClient(conn, "Client", id);
+                }
+
+
+                Console.Write("\nChoix : ");
+                choix = Console.ReadLine();
+                while (choix != "1" && choix != "2" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
             }
-		}
+            RetourMenu(conn);
+        }
 
 		static void ModuleCuisinier(MySqlConnection conn)
 		{
-			Console.Clear(); Console.WriteLine("Bienvenue sur le module cuisinier");
-			RetourMenu(conn);
-		}
+            Console.Clear(); Console.WriteLine("Bienvenue sur le module cuisinier\n");
+
+            Console.WriteLine("Que voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
+            Console.WriteLine("1 - Ajouter un cuisinier");
+            Console.WriteLine("2 - Supprimer un cuisinier");
+            Console.Write("\nChoix : ");
+            string choix = Console.ReadLine();
+            while (choix != "1" && choix != "2" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+
+            while (choix != "r")
+            {
+                if (choix == "1")
+                {
+                    Console.WriteLine("\nCréation d'un cuisinier : ");
+                    Console.Write("Entrer l'id du compte Tiers : "); int id = Convert.ToInt32(Console.ReadLine());
+
+                    bool clientExiste = Existe(conn, "Tiers", "IDTiers", id);
+					while (clientExiste == false)
+					{
+						Console.WriteLine("Compte tiers inexistant, rentrer un nouvel id");
+						Console.Write("Entrer l'id du compte Tiers : "); id = Convert.ToInt32(Console.ReadLine());
+						clientExiste = Existe(conn, "Tiers", "IDTiers", id);
+
+					}
+                    AjouterCuis(true, id, conn);
+                }
+
+                if (choix == "2")
+                {
+                    Console.WriteLine("\nSuppression d'un client : ");
+                    Console.Write("Entrer l'id du compte Tiers pour supprimer : "); int id = Convert.ToInt32(Console.ReadLine());
+
+                    bool clientExiste = Existe(conn, "Client", "IDTiers", id);
+                    while (clientExiste == false)
+                    {
+                        Console.WriteLine("Compte client inexistant, rentrer un nouvel id");
+                        Console.Write("Entrer l'id du compte Tiers : "); id = Convert.ToInt32(Console.ReadLine());
+                        clientExiste = Existe(conn, "Client", "IDTiers", id);
+                    }
+
+                    SupprimerClient(conn, "Client", id);
+                }
+
+
+                Console.Write("\nChoix : ");
+                choix = Console.ReadLine();
+                while (choix != "1" && choix != "2" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+            }
+            RetourMenu(conn);
+        }
 
 		static void ModuleCommande(MySqlConnection conn)
 		{
