@@ -1,5 +1,8 @@
 ﻿using static Association.Interface;
+using static Association.GrapheStation;
 using MySql.Data.MySqlClient;
+using OfficeOpenXml;
+using System.ComponentModel;
 
 namespace Association
 {
@@ -9,7 +12,8 @@ namespace Association
 "SERVER=127.0.0.1;PORT=3306;DATABASE=LivinParis;UID=root;PASSWORD=root";
         public static void Main(string[] args)
         {
-            //MetroParis();
+
+            MetroParis("Charles de Gaulle", "Wagram");
             //GrapheSimpleTest();
             //GererInterface();
 

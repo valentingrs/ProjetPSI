@@ -10,17 +10,28 @@ namespace Association
         /// Fonctions supplémentaires pour manipuler le graphe des stations Graphe<Station>
         /// Car il demande des méthodes particulières qui ne peuvent pas être traitées pour des types générique
 
-        static public void MetroParis()
+        static public void MetroParis(string s1, string s2)
         {
             Graphe<Station> metroParis = LireStationMetro("MetroParis.xlsx");
 
-            //DessinerGrapheStation(metroParis, "metro.png");
+            DessinerGrapheStation(metroParis, "metro.png");
 
-            Console.Write("Entrer une station de départ : "); string s1 = Console.ReadLine();
-            Console.Write("Entrer une station d'arrivée : "); string s2 = Console.ReadLine();
+            
 
             Station stat1 = TrouverStationParNom(metroParis, s1);
+            while (stat1 is null)
+            {
+                Console.WriteLine("Entrer un nom de station valide (attention aux accents, tirets et espaces, regarder la carte) : ");
+                s1 = Console.ReadLine();
+                stat1 = TrouverStationParNom(metroParis, s1);
+            }
             Station stat2 = TrouverStationParNom(metroParis, s2);
+            while (stat2 is null)
+            {
+                Console.WriteLine("Entrer un nom de station valide (attention aux accents, tirets et espaces, regarder la carte) : ");
+                s2 = Console.ReadLine();
+                stat2 = TrouverStationParNom(metroParis, s2);
+            }
             Console.WriteLine("\n\nDijkstra : ");
             Dijkstra(metroParis, metroParis.IdentifierNoeud(stat1), metroParis.IdentifierNoeud(stat2));
             //Console.WriteLine("\n\nFloyd Warshall : ");
