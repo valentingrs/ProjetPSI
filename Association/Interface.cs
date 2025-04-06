@@ -1,6 +1,7 @@
 using static Association.GrapheStation;
 using static Association.Bdd;
 using MySql.Data.MySqlClient;
+using System.Text;
 
 namespace Association
 {
@@ -18,6 +19,49 @@ namespace Association
 			Console.WriteLine("LIVIN PARIS\n\n");
 			Console.WriteLine("-> Module Tiers\n-> Module Client\n-> Module Cuisinier\n-> Module Commande\n-> Module Statistiques\n");
 		}
+
+        static void InterfaceModifierCompte(MySqlConnection conn, string type)
+        {
+            Console.Write("\nModfier un compte ");
+            if (type == "Client") { Console.WriteLine("client : "); }
+            if (type == "Cuisinier") { Console.WriteLine("cuisinier : "); }
+            Console.Write("Entrer l'id du compte à modiifer : "); int idTiers = Convert.ToInt32(Console.ReadLine());
+
+            if (!Existe(conn, type, "ID"+type, idTiers)) { Console.WriteLine("Compte " + type + " inexistant !"); }
+            else
+            {
+                Console.Write("Entrer la composante à modifier : nom, prénom, adresse, téléphone, code postal, ville ? ");
+                string colonne = Console.ReadLine().Trim().ToLower().Replace("é", "e"); // enlever majuscules, espaces, accents
+                Console.Write("Entrer la nouvelle composante modifée : ");
+                string modifiee = Console.ReadLine();
+                Console.WriteLine(colonne);
+                switch (colonne)
+                {
+                    case "nom":
+                        ModifierCompte(conn, "Nom", modifiee, idTiers, "Tiers");
+                        break;
+                    case "prenom":
+                        ModifierCompte(conn, "Prenom", modifiee, idTiers, "Tiers");
+                        break;
+                    case "adresse":
+                        ModifierCompte(conn, "Adresse", modifiee, idTiers, "Tiers");
+                        break;
+                    case "telephone":
+                        ModifierCompte(conn, "Tel", modifiee, idTiers, "Tiers");
+                        break;
+                    case "code postal":
+                        ModifierCompte(conn, "CodePostal", modifiee, idTiers, "Tiers");
+                        break;
+                    case "ville":
+                        ModifierCompte(conn, "Ville", modifiee, idTiers, "Tiers");
+                        break;
+                    default:
+                        Console.WriteLine("Paramètre rentré invalide");
+                        break;
+
+                }
+            }
+        }
 
 		static void ChoixModule(MySqlConnection conn)
 		{
@@ -55,11 +99,12 @@ namespace Association
             Console.Clear(); Console.WriteLine("Bienvenue sur le module tiers\n");
 
             Console.WriteLine("Que voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
-            Console.WriteLine("1 - Ajouter un comptes");
-			Console.WriteLine("2 - Supprimer un comptes");
+            Console.WriteLine("1 - Ajouter un compte");
+			Console.WriteLine("2 - Supprimer un compte");
+            Console.WriteLine("3 - Modifier un compte");
             Console.Write("\nChoix : ");
             string choix = Console.ReadLine();
-            while (choix != "1" && choix != "2" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+            while (choix != "1" && choix != "2" && choix != "3" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
 			while (choix != "r")
 			{
                 if (choix == "1")
@@ -89,10 +134,13 @@ namespace Association
 
                 }
                 
-               
+                if (choix == "3")
+                {
+                    InterfaceModifierCompte(conn, "Tiers");
+                }
                 Console.Write("\nChoix : ");
                 choix = Console.ReadLine();
-                while (choix != "1" && choix != "2" && choix != "r") { Console.Write("\nRentrer un choix valide : "); choix = Console.ReadLine(); }
+                while (choix != "1" && choix != "2" && choix != "3" && choix != "r") { Console.Write("\nRentrer un choix valide : "); choix = Console.ReadLine(); }
             }
             RetourMenu(conn);
         }
@@ -105,9 +153,10 @@ namespace Association
 			Console.WriteLine("1 - Ajouter un client");
             Console.WriteLine("2 - Supprimer un client");
             Console.WriteLine("3 - Afficher les clients");
+            Console.WriteLine("4 - Modifier un client");
             Console.Write("\nChoix : ");
 			string choix = Console.ReadLine();
-			while (choix != "1" && choix != "2" && choix != "3" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+			while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
 
             while (choix != "r")
             {
@@ -152,10 +201,15 @@ namespace Association
                     Console.WriteLine(""); AffichageClients(conn);
                 }
 
-                Console.WriteLine("\n Que voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
+                if (choix == "4")
+                {
+                    InterfaceModifierCompte(conn, "Client");
+                }
+
+                Console.WriteLine("\nQue voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
                 Console.Write("Choix : ");
                 choix = Console.ReadLine();
-                while (choix != "1" && choix != "2" && choix != "3" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+                while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
             }
             RetourMenu(conn);
         }
@@ -196,9 +250,12 @@ namespace Association
             Console.WriteLine("1 - Ajouter un cuisinier");
             Console.WriteLine("2 - Supprimer un cuisinier");
 			Console.WriteLine("3 - En tant que cuisinier, ajouter un plat");
+            Console.WriteLine("4 - Modifier un cuisinier");
+            Console.WriteLine("5 - Afficher les données d'un cuisinier");
             Console.Write("\nChoix : ");
             string choix = Console.ReadLine();
-            while (choix != "1" && choix != "2" && choix != "3" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+            while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && 
+                choix != "5" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
 
             while (choix != "r")
             {
@@ -255,14 +312,52 @@ namespace Association
                     ModulePlat(conn, id);
                 }
 
+                if (choix == "4")
+                {
+                    InterfaceModifierCompte(conn, "Cuisinier");
+                }
 
-                Console.Write("\nChoix : ");
-                choix = Console.ReadLine();
-                while (choix != "1" && choix != "2" && choix != "3" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+                if (choix == "5")
+                {
+                    Console.Write("Entrer l'id du Cuisinier dont vous voulez afficher les infos : ");
+                    int idCuisinier = Convert.ToInt32(Console.ReadLine());
+                    while (!Existe(conn, "Cuisinier", "IDCuisinier", idCuisinier)) 
+                    {
+                        Console.Write("Entrer un id valide : ");
+                        idCuisinier = Convert.ToInt32(Console.ReadLine());
+                    }
+                    ChoixAffichageCuisinier(conn, idCuisinier);
+
+                }
+
             }
             RetourMenu(conn);
         }
 
+        public static void ChoixAffichageCuisinier(MySqlConnection conn, int idCuisinier)
+        {
+            Console.WriteLine("Quelle information voulez-vous ? Séléctionner le numéro associé");
+            Console.WriteLine("1 - Clients servis");
+
+            Console.Write("\nChoix : ");
+            string choix = Console.ReadLine();
+            while (choix != "1" ) { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+            if (choix == "1")
+            {
+                Console.Write("Depuis une date précise ? O ou N (N par défaut) : ");
+                string date = Console.ReadLine().Trim().ToLower();
+                if (date == "o")
+                {
+                    Console.Write("Entrer une date au format yyyy-mm-jj : ");
+                    date = Console.ReadLine();
+                    ClientsServisCuisinier(conn, true, date, idCuisinier);
+                }
+                else
+                {
+                    ClientsServisCuisinier(conn, false, "", idCuisinier);
+                }
+            }
+        }
         static void ModulePlat(MySqlConnection conn, int idCuisinier)
         {
             Console.WriteLine("Ajout d'un plat");

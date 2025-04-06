@@ -1,5 +1,7 @@
 using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Relational;
 using System.ComponentModel;
+using System.Data.Common;
 using System.Transactions;
 
 namespace Association
@@ -95,7 +97,24 @@ namespace Association
 			
 		}
 
-		public static void SupprimerUnCompte(MySqlConnection conn, string Table, int Identifiant)
+        public static void ModifierCompte(MySqlConnection conn, string ElementAChanger, string NouvelElement, int identifiant, string Table)
+        { 
+            try
+            {
+                string query = $"UPDATE {Table} SET {ElementAChanger}='{NouvelElement}' WHERE ID{Table} = {identifiant};";
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.ExecuteNonQuery();
+                    Console.WriteLine("Votre modification a bien été prise en compte.");
+                }
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine($"Erreur MySQL : {e.Message}");
+            }
+        }
+
+        public static void SupprimerUnCompte(MySqlConnection conn, string Table, int Identifiant)
 		{
 			try
 			{
@@ -277,6 +296,43 @@ namespace Association
             }
         }
 
+
+        public static void ClientsServisCuisinier(MySqlConnection conn, bool temps, string date, int idCuisinier)
+        {
+            try
+            {
+                string query = "SELECT Tiers.IDTiers, Tiers.Nom, Tiers.Prenom FROM Commande " +
+                               "JOIN Client ON Commande.IDClient = Client.IDClient " +
+                               "JOIN Tiers ON Client.IDClient = Tiers.IDTiers " +
+                              $"WHERE Commande.IDCuisinier = {idCuisinier}";
+                if (temps)
+                {
+                    query += $"WHERE Commande.DateCommande >=  '{date}';";
+                }
+                else { query += ";"; }
+
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                int ligne = 0;
+                while (reader.Read())
+                {
+                    ligne++;
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        Console.Write($"{reader.GetName(i)}: {reader[i]}\t");
+                    }
+                    Console.WriteLine();
+                }
+
+                if (ligne == 0)
+                    Console.WriteLine("Aucun résultat.");
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine($"Erreur MySQL : {e.Message}");
+            }
+        }
         #endregion
 
         #region Commande
