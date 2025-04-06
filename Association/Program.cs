@@ -13,7 +13,6 @@ namespace Association
         public static void Main(string[] args)
         {
 
-            MetroParis("Charles de Gaulle", "Wagram");
             //GrapheSimpleTest();
             //GererInterface();
 

@@ -21,14 +21,14 @@ namespace Association
             Station stat1 = TrouverStationParNom(metroParis, s1);
             while (stat1 is null)
             {
-                Console.WriteLine("Entrer un nom de station valide (attention aux accents, tirets et espaces, regarder la carte) : ");
+                Console.Write("Entrer un nom de station valide (attention aux accents, tirets et espaces, regarder la carte) : ");
                 s1 = Console.ReadLine();
                 stat1 = TrouverStationParNom(metroParis, s1);
             }
             Station stat2 = TrouverStationParNom(metroParis, s2);
             while (stat2 is null)
             {
-                Console.WriteLine("Entrer un nom de station valide (attention aux accents, tirets et espaces, regarder la carte) : ");
+                Console.Write("Entrer un nom de station valide (attention aux accents, tirets et espaces, regarder la carte) : ");
                 s2 = Console.ReadLine();
                 stat2 = TrouverStationParNom(metroParis, s2);
             }
