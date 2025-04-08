@@ -1,35 +1,55 @@
-USE LivinParis;
-SHOW TABLES;
-SET SQL_SAFE_UPDATES=0;
+-- Insertion dans Tiers : Clients et Cuisiniers (dont 2 sont les deux)
+INSERT INTO Tiers VALUES
+(1, '75001', 'Paris', 'alice@mail.com', '0102030405', 'Dupont', '1 rue de Paris', 'Alice'),
+(2, '75002', 'Paris', 'bob@mail.com', '0102030406', 'Durand', '2 rue de Lyon', 'Bob'),
+(3, '75003', 'Paris', 'carol@mail.com', '0102030407', 'Moreau', '3 rue de Rome', 'Carol'),
+(4, '75004', 'Paris', 'dave@mail.com', '0102030408', 'Bernard', '4 rue de Madrid', 'Dave'),
+(5, '75005', 'Paris', 'eve@mail.com', '0102030409', 'Petit', '5 rue de Londres', 'Eve'),
+(6, '75006', 'Paris', 'frank@mail.com', '0102030410', 'Noel', '6 rue d’Athènes', 'Frank'),
+(7, '75007', 'Paris', 'grace@mail.com', '0102030411', 'Legrand', '7 rue de Rome', 'Grace'),
+(8, '75008', 'Paris', 'hugo@mail.com', '0102030412', 'Lemoine', '8 rue d’Amsterdam', 'Hugo'),
+(9, '75009', 'Paris', 'irene@mail.com', '0102030413', 'Renard', '9 rue de Londres', 'Irène'),
+(10, '75010', 'Paris', 'john@mail.com', '0102030414', 'Martin', '10 rue de Berlin', 'John');
+INSERT INTO Tiers VALUES
+(11, '75011', 'Paris', 'chef1@mail.com', '0102030415', 'Gault', '11 rue du Chef', 'Michel'),
+(12, '75012', 'Paris', 'chef2@mail.com', '0102030416', 'Millau', '12 rue du Chef', 'Paul'),
+(13, '75013', 'Paris', 'chef3@mail.com', '0102030417', 'Robuchon', '13 rue du Chef', 'Joël');
 
--- 1. Création des Tiers
-INSERT INTO Tiers (IDTiers, CodePostal, Ville, Email, Tel, Nom, Adresse, Prenom) VALUES
-(1, '75001', 'Paris', 'client1@email.com', '0123456789', 'Dupont', '10 rue de Paris', 'Jean'),
-(2, '75002', 'Paris', 'client2@email.com', '0123456790', 'Martin', '15 avenue des Champs', 'Marie'),
-(3, '75003', 'Paris', 'cuisinier1@email.com', '0123456791', 'Lemoine', '20 rue de la République', 'Pierre'),
-(4, '75004', 'Paris', 'cuisinier2@email.com', '0123456792', 'Durand', '25 boulevard Saint-Germain', 'Lucie'),
-(5, '75005', 'Paris', 'client_cuisinier1@email.com', '0123456793', 'Benoit', '30 rue de l''Opéra', 'Antoine'),
-(6, '75006', 'Paris', 'client_cuisinier2@email.com', '0123456794', 'Berger', '35 rue du Faubourg', 'Sophie');
+-- Insertion Clients (IDs 1 à 10)
+INSERT INTO Client VALUES
+(1), (2), (3), (4), (5), (6), (7), (8), (9), (10);
 
--- 2. Création des Clients (Client est une référence à Tiers)
-INSERT INTO Client (IDClient) VALUES
-(1),  -- Client 1
-(2),  -- Client 2
-(5),  -- Client 3 qui est aussi Cuisinier
-(6);  -- Client 4 qui est aussi Cuisinier
+-- Insertion Cuisiniers (5 cuisiniers, les IDs 3 et 6 sont aussi clients)
+INSERT INTO Cuisinier VALUES
+(3), (6), (11), (12), (13);
 
--- 3. Création des Cuisiniers (Cuisinier est une référence à Tiers)
-INSERT INTO Cuisinier (IDCuisinier) VALUES
-(3),  -- Cuisinier 1
-(4),  -- Cuisinier 2
-(5),  -- Cuisinier 3 qui est aussi Client
-(6);  -- Cuisinier 4 qui est aussi Client
+-- Insertion de 10 plats avec plusieurs par cuisinier
+INSERT INTO Plat VALUES
+(1, 'Entrée', 'Salade César', '2025-04-01', '2025-04-05', 'Française', 'Végétarien', 'Salade, Parmesan, Croutons', 8.50, 1, 3),
+(2, 'Plat', 'Boeuf Bourguignon', '2025-04-01', '2025-04-06', 'Française', 'Omnivore', 'Boeuf, Vin rouge', 15.00, 2, 6),
+(3, 'Plat', 'Lasagnes', '2025-04-01', '2025-04-05', 'Italienne', 'Omnivore', 'Pâtes, Viande, Fromage', 12.00, 2, 11),
+(4, 'Dessert', 'Tiramisu', '2025-04-02', '2025-04-06', 'Italienne', 'Végétarien', 'Mascarpone, Café', 6.00, 1, 11),
+(5, 'Plat', 'Couscous', '2025-04-02', '2025-04-06', 'Marocaine', 'Omnivore', 'Semoule, Légumes, Viande', 13.00, 2, 3),
+(6, 'Entrée', 'Soupe Miso', '2025-04-02', '2025-04-04', 'Japonaise', 'Vegan', 'Miso, Tofu', 5.50, 1, 12),
+(7, 'Dessert', 'Mochi', '2025-04-01', '2025-04-07', 'Japonaise', 'Végétarien', 'Riz gluant, Sucre', 4.50, 1, 12),
+(8, 'Plat', 'Paella', '2025-04-01', '2025-04-06', 'Espagnole', 'Omnivore', 'Riz, Fruits de mer', 14.00, 2, 13),
+(9, 'Dessert', 'Crème brûlée', '2025-04-02', '2025-04-05', 'Française', 'Végétarien', 'Crème, Sucre', 6.00, 1, 3),
+(10, 'Plat', 'Tajine', '2025-04-01', '2025-04-06', 'Marocaine', 'Omnivore', 'Agneau, Abricot', 14.00, 2, 3);
 
--- 4. Création des Plats
-INSERT INTO Plat (IDPlat, TypePlat, NomPlat, DateFabrication, DatePeremption, Nationalite, Regime, Ingredients, PrixPlat, NombrePersonnes, IDCuisinier) VALUES
-(1, 'Entrée', 'Salade César', '2025-04-01', '2025-04-10', 'Française', 'Végétarien', 'Laitue, Parmesan, Croutons, Poulet', 12.50, 4, 3),  -- Cuisinier 1
-(2, 'Plat principal', 'Ratatouille', '2025-04-02', '2025-04-15', 'Française', 'Végétarien', 'Courgettes, Aubergines, Tomates, Poivrons', 18.00, 4, 3),  -- Cuisinier 2
-(3, 'Dessert', 'Tarte Tatin', '2025-04-03', '2025-04-20', 'Française', 'Sucré', 'Pommes, Beurre, Pâte feuilletée', 9.00, 6, 5),  -- Cuisinier 3
-(4, 'Plat principal', 'Boeuf Bourguignon', '2025-04-04', '2025-04-18', 'Française', 'Carnivore', 'Boeuf, Carottes, Vin rouge, Oignons', 22.00, 6, 6),  -- Cuisinier 4
-(5, 'Entrée', 'Soupe à l\'oignon', '2025-04-05', '2025-04-12', 'Française', 'Végétarien', 'Oignons, Bouillon, Fromage râpé, Pain', 10.00, 4, 3);  -- Cuisinier 1
+-- Commandes (au moins un client commande plusieurs plats)
+INSERT INTO Commande VALUES
+(1, '2025-04-03', '12:30:00', 1, 3),
+(2, '2025-03-03', '13:00:00', 2, 6),
+(3, '2025-04-03', '13:30:00', 1, 12),
+(4, '2025-04-04', '14:00:00', 4, 11);
 
+-- Association Commande <-> Plat
+INSERT INTO PlatCommande VALUES
+(1, 1), -- client 1 commande Salade César
+(1, 9), -- client 1 commande Crème brûlée
+(2, 2), -- client 2 commande Boeuf Bourguignon
+(3, 6), -- client 1 commande Soupe Miso
+(3, 7), -- client 1 commande Mochi
+(4, 3); -- client 4 commande Lasagnes
+
+SELECT c.IDCommande, c.DateCommande, c.IDClient, c.IDCuisinier FROM Commande c WHERE c.IDClient = 4;

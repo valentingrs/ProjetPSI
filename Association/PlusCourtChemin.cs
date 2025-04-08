@@ -1,4 +1,7 @@
-﻿namespace Association
+﻿using System.Diagnostics;
+using static Association.GrapheStation;
+
+namespace Association
 {
 	internal class PlusCourtChemin
 	{
@@ -245,6 +248,43 @@
             }
 
             Console.WriteLine($"Distance totale: {Dist[arrivee]}");
+        }
+
+        public static void TestAlgoGraphes()
+        {
+            // on teste l'efficacité en temps des algorithmes avec le graphe des stations de métro
+            Graphe<Station> graphe = LireStationMetro("MetroParis.xlsx");
+            // Pour le test on prendra deux stations sufisamment éloignées et demandant plusieurs correspondances
+            Station dep = TrouverStationParNom(graphe, "Eglise d'Auteuil");
+            Station arr = TrouverStationParNom(graphe, "Saint-Fargeau");
+
+            Noeud<Station> noeudDep = graphe.IdentifierNoeud(dep);
+            Noeud<Station> noeudArr = graphe.IdentifierNoeud(arr);
+
+            Console.WriteLine("Chemin le plus court entre Porte de Champerret et Quai de la Gare");
+            Console.WriteLine("On a choisi ces deux stations car elles sont suffisamment éloignées et demandent plusieurs correspondances ");
+            
+            Console.WriteLine("\nAvec Dijkstra : ");
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            Dijkstra(graphe, noeudDep, noeudArr);
+            stopwatch.Stop();
+            Console.WriteLine("Temps d'execution avec l'algorithme de Dijkstra : " + stopwatch.ElapsedMilliseconds + " ms");
+
+            Console.WriteLine("\nAvec Bellman Ford : ");
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+            Dijkstra(graphe, noeudDep, noeudArr);
+            stopwatch.Stop();
+            Console.WriteLine("Temps d'execution avec l'algorithme de Bellman Ford : " + stopwatch.ElapsedMilliseconds + " ms");
+
+            Console.WriteLine("\nAvec Floyd-Warhsall : ");
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+            Dijkstra(graphe, noeudDep, noeudArr);
+            stopwatch.Stop();
+            Console.WriteLine("Temps d'execution avec l'algorithme de Floyd-Warshall : " + stopwatch.ElapsedMilliseconds + " ms");
+
         }
     }
 }

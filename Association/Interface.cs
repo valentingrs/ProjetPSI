@@ -2,6 +2,7 @@ using static Association.GrapheStation;
 using static Association.Bdd;
 using MySql.Data.MySqlClient;
 using System.Text;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Association
 {
@@ -330,6 +331,10 @@ namespace Association
 
                 }
 
+                Console.WriteLine("\nQue voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
+                Console.Write("Choix : ");
+                choix = Console.ReadLine();
+                while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "5" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
             }
             RetourMenu(conn);
         }
@@ -338,10 +343,12 @@ namespace Association
         {
             Console.WriteLine("Quelle information voulez-vous ? Séléctionner le numéro associé");
             Console.WriteLine("1 - Clients servis");
+            Console.WriteLine("2 - Plats réalisés et leur fréquence");
+            Console.WriteLine("3 - Plat du jour proposé(s) : ");
 
-            Console.Write("\nChoix : ");
+            Console.Write("\nChoix d'information : : ");
             string choix = Console.ReadLine();
-            while (choix != "1" ) { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+            while (choix != "1" && choix != "2" && choix != "3") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
             if (choix == "1")
             {
                 Console.Write("Depuis une date précise ? O ou N (N par défaut) : ");
@@ -357,11 +364,26 @@ namespace Association
                     ClientsServisCuisinier(conn, false, "", idCuisinier);
                 }
             }
+
+            if (choix == "2")
+            {
+                Console.WriteLine("Plats proposés et leur féquence du cuisinier n°" + idCuisinier  + " : ");
+                PlatsAffichage(conn, idCuisinier, "PlatsFreq");
+
+            }
+
+            if (choix == "3")
+            {
+                Console.WriteLine("Plat du jours proposés par le cuisinier n° " + idCuisinier + " : ");
+                PlatsAffichage(conn, idCuisinier, "PlatDuJour");
+            }
         }
         static void ModulePlat(MySqlConnection conn, int idCuisinier)
         {
             Console.WriteLine("Ajout d'un plat");
-            Console.Write("Id du plat : "); int idplat = Convert.ToInt32(Console.ReadLine());
+            Random random = new Random();
+            int idplat = new Random().Next(1, 1001);
+            while (Existe(conn, "Plat", "IDPlat", idplat)) { idplat = new Random().Next(1, 1001); }
             Console.Write("Nom du plat : "); string nomPlat = Console.ReadLine();
             Console.Write("Type du plat : "); string type = Console.ReadLine();
             Console.Write("Date de fabrication du plat (JJ-MM-AAAA) : "); DateTime fabrication = Convert.ToDateTime(Console.ReadLine());
@@ -379,14 +401,15 @@ namespace Association
 		{
 			Console.Clear(); Console.WriteLine("Bienvenue sur le module commande\nOptions : \n");
             Console.WriteLine("1 - Faire une commande");
-
+            Console.WriteLine("2 - Plats disponibles");
+            Console.WriteLine("3 - Informations sur un plat");
 			Console.WriteLine("Pour choisir une option, rentrer le numéro au début de l'option");
 			Console.WriteLine("Pour retourner au menu principal, entrer 'r'");
 			Console.Write("\nChoix : ");
 			
 			string choix = Console.ReadLine();
 
-			while (choix != "1" && choix != "r") 
+			while (choix != "1" && choix != "2" && choix != "3" && choix != "r") 
 			{
 				Console.Write("\nChoix invalide, rentrer un nouveau choix : ");
 				choix = Console.ReadLine();
@@ -397,7 +420,12 @@ namespace Association
                 if (choix == "1")
                 {
                     Console.WriteLine("Ajout d'une commande : ");
-                    Console.Write("Entrer un id de commande : "); int idCommande = Convert.ToInt32(Console.ReadLine());
+                    Random random = new Random();
+                    int idCommande = random.Next(1, 1001);
+                    while(Existe(conn, "Commande", "IDCommande", idCommande))
+                    {
+                        idCommande = random.Next(1, 1001);
+                    }
                     Console.Write("Entrer une date de commande : "); DateTime date = Convert.ToDateTime(Console.ReadLine());
                     Console.Write("Entrer une heure de commande : "); DateTime heure = Convert.ToDateTime(Console.ReadLine());
                     Console.Write("Entrer un id de client : "); int idClient = Convert.ToInt32(Console.ReadLine());
@@ -433,10 +461,26 @@ namespace Association
                     MetroParis(station1, station2);
                 }
 
+                if (choix == "2")
+                {
+                    Console.WriteLine("Plats disponibles : ");
+                    PlatsDispos(conn);
+                }
+
+                if (choix == "3")
+                {
+                    Console.Write("Identifiant du plat dont vous voulez avoir des infos (consulter la rubrique Plats disponibles si besoin) : ");
+                    int idPlatInfo = Convert.ToInt32(Console.ReadLine());
+                    while (!Existe(conn, "Plat", "IDPlat", idPlatInfo)) { Console.Write("Entrer un id de plat valide : "); idPlatInfo = Convert.ToInt32(Console.ReadLine()); }
+                    PlatsAffichage(conn, idPlatInfo, "InfosPlat");
+
+
+                }
+
                 Console.Write("\nChoix : ");
 				choix = Console.ReadLine();
 
-				while (choix != "1" && choix != "r")
+				while (choix != "1" && choix != "2" && choix != "3" && choix != "r")
 				{
 					Console.Write("\nChoix invalide, rentrer un nouveau choix : ");
 					choix = Console.ReadLine();
@@ -450,8 +494,138 @@ namespace Association
 
 		static void ModuleStatistiques(MySqlConnection conn)
 		{
-			Console.Clear(); Console.WriteLine("Bienvenue sur le module statistiques");
-			RetourMenu(conn);
-		}
-	}
+            Console.Clear(); Console.WriteLine("Bienvenue sur le module statistiques\nOptions : \n");
+            Console.WriteLine("1 - Nombre de commandes effectuées par cuisinier");
+            Console.WriteLine("2 - Commandes selon une période de temps");
+            Console.WriteLine("3 - Moyenne des prix des commandes");
+            Console.WriteLine("4 - Moyenne des comptes clients");
+            Console.WriteLine("5 - Liste des commandes pour un client selon la nationalité des plats, la période ");
+            Console.WriteLine("Pour choisir une option, rentrer le numéro au début de l'option");
+            Console.WriteLine("Pour retourner au menu principal, entrer 'r'");
+            Console.Write("\nChoix : ");
+
+            string choix = Console.ReadLine();
+
+            while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "5" && choix != "r")
+            {
+                Console.Write("\nChoix invalide, rentrer un nouveau choix : ");
+                choix = Console.ReadLine();
+            }
+
+            while (choix != "r")
+            {
+                if (choix == "1")
+                {
+                    Console.WriteLine("Nombre de commandes effecutées par cuisinier : ");
+                    NombreCommandes(conn);
+                }
+
+                if (choix == "2")
+                {
+                    CommandesTemps(conn);
+                }
+
+                if (choix == "3")
+                {
+                    Console.WriteLine("Moyenne des prix des commandes : ");
+
+                    MoyenneStats(conn, "PrixCommandes");
+                }
+                if (choix == "4")
+                {
+                    Console.WriteLine("Moyenne de comptes clients");
+                    MoyenneStats(conn, "MoyenneClients");
+                }
+
+                if (choix == "5")
+                {
+                    Console.Write("Entrer l'identifiant du client : "); int idclient = Convert.ToInt32(Console.ReadLine());
+                    while (!Existe(conn, "Client", "IDClient", idclient))
+                    {
+                        Console.WriteLine("Entrer un identifiant valide de client : "); idclient = Convert.ToInt32(Console.ReadLine());
+                    }
+                    Console.WriteLine("Afficher la liste des commandes pour un client selon : ");
+                    Console.WriteLine("1 - Nationalité");
+                    Console.WriteLine("2 - Période");
+                    Console.Write("Choix (entrer le numéro) : "); string choixListe = Console.ReadLine().Trim();
+                    while (choixListe != "1" && choixListe != "2")
+                    {
+                        Console.Write("Rentrer un choix valide : ");
+                        choixListe = Console.ReadLine();
+                    }
+                    if (choixListe == "1")
+                    {
+                        Console.Write("Entrer une nationalité : ");
+                        string nationalite = Console.ReadLine();
+                        NatioPlats(conn, nationalite, idclient);
+                    }
+                    if (choixListe == "2")
+                    {
+                        CommandesTemps(conn, idclient);
+
+                    }
+                }
+
+                Console.Write("ok");
+                Console.Write("\nChoix : ");
+                choix = Console.ReadLine();
+
+                while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "5" && choix != "r")
+                {
+                    Console.Write("\nChoix invalide, rentrer un nouveau choix : ");
+                    choix = Console.ReadLine();
+                }
+
+            }
+            RetourMenu(conn);
+        }
+
+        public static void CommandesTemps(MySqlConnection conn, int? idClient=null)
+        {
+            Console.WriteLine("Affiches les commandes selon : ");
+            Console.WriteLine("1 - Toutes les commandes réalisées");
+            Console.WriteLine("2 - Sur une période données");
+            Console.WriteLine("3 - Depuis un certain temps");
+            Console.WriteLine("4 - Jusqu'à un certain temps");
+
+            Console.Write("Choix : "); string choix = Console.ReadLine();
+            while (choix != "1" && choix != "2" && choix != "3" && choix != "4")
+            {
+                Console.Write("Rentrer un numéro valide : "); choix = Console.ReadLine();
+            }
+
+            if (choix == "1")
+            {
+                DateTime date1 = Convert.ToDateTime("1900-01-01"); // date très dans le passé
+                DateTime date2 = Convert.ToDateTime("2100-01-01");
+                Console.Write("ok");
+                AfficherCommandes(conn, date1, date2, "Toujours", idClient);   
+            }
+
+            if (choix == "2")
+            {
+                Console.Write("Entrer une date de début : ");
+                DateTime debut = Convert.ToDateTime(Console.ReadLine());
+                Console.Write("Entrer une date de fin : ");
+                DateTime fin = Convert.ToDateTime(Console.ReadLine());
+                AfficherCommandes(conn, debut, fin, "DebutEtFin", idClient);
+            }
+
+            if (choix == "3")
+            {
+                Console.Write("Entrer une date de début : ");
+                DateTime debut = Convert.ToDateTime(Console.ReadLine());
+                DateTime fin = Convert.ToDateTime("2100-01-01");
+                AfficherCommandes(conn, debut, fin, "PasFin", idClient);
+            }
+
+            if (choix == "4")
+            {
+                Console.Write("Entrer une date de fin : ");
+                DateTime fin = Convert.ToDateTime(Console.ReadLine());
+                DateTime debut = Convert.ToDateTime("1900-01-01");
+                AfficherCommandes(conn, debut, fin, "PasDebut", idClient);
+            }
+        }
+    }
 }

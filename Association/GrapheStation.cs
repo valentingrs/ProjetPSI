@@ -21,18 +21,17 @@ namespace Association
             Station stat1 = TrouverStationParNom(metroParis, s1);
             while (stat1 is null)
             {
-                Console.Write("Entrer un nom de station valide (attention aux accents, tirets et espaces, regarder la carte) : ");
+                Console.Write("Entrer un nom de station de départ valide (attention aux accents, tirets et espaces, regarder la carte) : ");
                 s1 = Console.ReadLine();
                 stat1 = TrouverStationParNom(metroParis, s1);
             }
             Station stat2 = TrouverStationParNom(metroParis, s2);
             while (stat2 is null)
             {
-                Console.Write("Entrer un nom de station valide (attention aux accents, tirets et espaces, regarder la carte) : ");
+                Console.Write("Entrer un nom de station d'arrivée valide (attention aux accents, tirets et espaces, regarder la carte) : ");
                 s2 = Console.ReadLine();
                 stat2 = TrouverStationParNom(metroParis, s2);
             }
-            Console.WriteLine("\n\nDijkstra : ");
             Dijkstra(metroParis, metroParis.IdentifierNoeud(stat1), metroParis.IdentifierNoeud(stat2));
             //Console.WriteLine("\n\nFloyd Warshall : ");
             //FloydWarshall(metroParis, metroParis.IdentifierNoeud(stat1), metroParis.IdentifierNoeud(stat2));
