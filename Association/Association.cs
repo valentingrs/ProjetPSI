@@ -6,7 +6,7 @@ namespace Association
 	internal class Association
 	{
 		/// Fichier contenant les manipulation sur un graphe simple
-		/// Pour le rendu n°1 mais pas vraiment utile pour la suite des rendus <summary>
+		/// Pour le rendu nï¿½1 mais pas vraiment utile pour la suite des rendus <summary>
 		/// Fichier contenant les manipulation sur un graphe simple
 
 		static public Graphe<string> LireFichier()
@@ -16,8 +16,8 @@ namespace Association
 			List<string> dico = new List<string>();
 			string[] lignes = File.ReadAllLines(filename);
 
-			Graphe<string> association = new Graphe<string>(false); // non orienté car associations réciproques
-																	// non pondéré également
+			Graphe<string> association = new Graphe<string>(false); // non orientï¿½ car associations rï¿½ciproques
+																	// non pondï¿½rï¿½ ï¿½galement
 			for (int i = 24; i <= 101; i++)
 			{
 				string[] ligne = lignes[i].Split(' ');
@@ -64,24 +64,24 @@ namespace Association
             Noeud<string> s = new Noeud<string>("");
             foreach (Noeud<string> som in association.Noeuds) { if (som.Nom == res) { s = som; } }
 
-            Console.WriteLine("\nParcours en largeur à partir du sommet " + s.Nom);
+            Console.WriteLine("\nParcours en largeur ï¿½ partir du sommet " + s.Nom);
             association.ParcoursEnLargeur(s);
 
-            Console.WriteLine("\n\n" + "Parcours en profondeur à partir du sommet " + s.Nom);
+            Console.WriteLine("\n\n" + "Parcours en profondeur ï¿½ partir du sommet " + s.Nom);
             association.ParcoursEnProfondeur(s);
             Console.WriteLine("\n");
 
-            if (association.EstConnexe()) { Console.WriteLine("\nD'après le DFS, le graphe est connexe"); }
-            else { Console.WriteLine("D'après le DFS, il n'est pas connexe"); }
+            if (association.EstConnexe()) { Console.WriteLine("\nD'aprï¿½s le DFS, le graphe est connexe"); }
+            else { Console.WriteLine("D'aprï¿½s le DFS, il n'est pas connexe"); }
 
             DessinerGraphe(association, "graphe.png");
-            Console.WriteLine("\nGraphe affiché dans le dossier bin/Debut/7.0 du projet sous le nom graphe.png");
+            Console.WriteLine("\nGraphe affichï¿½ dans le dossier bin/Debut/7.0 du projet sous le nom graphe.png");
 
             string cheminImage = Path.GetFullPath("graphe.png");
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
                 FileName = cheminImage,
-                UseShellExecute = true  // Permet d'utiliser l'application par défaut pour ouvrir l'image
+                UseShellExecute = true  // Permet d'utiliser l'application par dï¿½faut pour ouvrir l'image
             });
         }
 
@@ -119,6 +119,8 @@ namespace Association
             //Dijkstra(g, g.Noeuds[2], g.Noeuds[4]);
             //FloydWarshall(g, 3, 5);
             //Bellman_Ford(g, g.Noeuds[2], g.Noeuds[4]);
+            // Grosse beuteu
+            qsgciudgciuvgovg
         }
     }
 }
