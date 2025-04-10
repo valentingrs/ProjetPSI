@@ -34,7 +34,11 @@ INSERT INTO Plat VALUES
 (7, 'Dessert', 'Mochi', '2025-04-01', '2025-04-07', 'Japonaise', 'Végétarien', 'Riz gluant, Sucre', 4.50, 1, 12),
 (8, 'Plat', 'Paella', '2025-04-01', '2025-04-06', 'Espagnole', 'Omnivore', 'Riz, Fruits de mer', 14.00, 2, 13),
 (9, 'Dessert', 'Crème brûlée', '2025-04-02', '2025-04-05', 'Française', 'Végétarien', 'Crème, Sucre', 6.00, 1, 3),
-(10, 'Plat', 'Tajine', '2025-04-01', '2025-04-06', 'Marocaine', 'Omnivore', 'Agneau, Abricot', 14.00, 2, 3);
+(10, 'Plat', 'Tajine', '2025-04-01', '2025-04-06', 'Marocaine', 'Omnivore', 'Agneau, Abricot', 14.00, 2, 3),
+(11, 'Entrée', 'Bruschetta', '2025-04-03', '2025-04-06', 'Italienne', 'Végétarien', 'Pain, Tomate, Basilic', 5.00, 1, 11),
+(12, 'Plat', 'Ramen', '2025-04-03', '2025-04-07', 'Japonaise', 'Omnivore', 'Nouilles, Bouillon, Porc', 13.50, 2, 12),
+(13, 'Dessert', 'Baklava', '2025-04-03', '2025-04-08', 'Turque', 'Végétarien', 'Pâte filo, Miel, Noix', 6.50, 1, 13),
+(14, 'Plat', 'Pad Thaï', '2025-04-03', '2025-04-07', 'Thaïlandaise', 'Vegan', 'Nouilles, Tofu, Légumes', 11.00, 2, 6);
 
 -- Commandes (au moins un client commande plusieurs plats)
 INSERT INTO Commande VALUES
@@ -42,6 +46,9 @@ INSERT INTO Commande VALUES
 (2, '2025-03-03', '13:00:00', 2, 6),
 (3, '2025-04-03', '13:30:00', 1, 12),
 (4, '2025-04-04', '14:00:00', 4, 11);
+(5, '2025-04-05', '12:00:00', 5, 11),
+(6, '2025-04-05', '19:30:00', 6, 13),
+(7, '2025-04-06', '18:45:00', 3, 6);
 
 -- Association Commande <-> Plat
 INSERT INTO PlatCommande VALUES
@@ -50,6 +57,10 @@ INSERT INTO PlatCommande VALUES
 (2, 2), -- client 2 commande Boeuf Bourguignon
 (3, 6), -- client 1 commande Soupe Miso
 (3, 7), -- client 1 commande Mochi
-(4, 3); -- client 4 commande Lasagnes
-
-SELECT c.IDCommande, c.DateCommande, c.IDClient, c.IDCuisinier FROM Commande c WHERE c.IDClient = 4;
+(4, 3), -- client 4 commande Lasagnes
+(5, 11), -- client 5 commande Bruschetta
+(5, 3),  -- client 5 commande Lasagnes
+(6, 13), -- client 6 commande Baklava
+(6, 8),  -- client 6 commande Paella
+(7, 14), -- client 3 commande Pad Thaï
+(7, 2);  -- client 3 commande Boeuf Bourguignon
