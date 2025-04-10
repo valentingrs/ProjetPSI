@@ -35,7 +35,6 @@ namespace Association
                 string colonne = Console.ReadLine().Trim().ToLower().Replace("é", "e"); // enlever majuscules, espaces, accents
                 Console.Write("Entrer la nouvelle composante modifée : ");
                 string modifiee = Console.ReadLine();
-                Console.WriteLine(colonne);
                 switch (colonne)
                 {
                     case "nom":
@@ -208,6 +207,7 @@ namespace Association
                 }
 
                 Console.WriteLine("\nQue voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
+                Console.WriteLine("1 - Ajouter un client\n2 - Supprimer un client\n3 - Afficher les clients\n4 - Modifier un client");
                 Console.Write("Choix : ");
                 choix = Console.ReadLine();
                 while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
@@ -566,7 +566,6 @@ namespace Association
                     }
                 }
 
-                Console.Write("ok");
                 Console.Write("\nChoix : ");
                 choix = Console.ReadLine();
 
@@ -598,7 +597,6 @@ namespace Association
             {
                 DateTime date1 = Convert.ToDateTime("1900-01-01"); // date très dans le passé
                 DateTime date2 = Convert.ToDateTime("2100-01-01");
-                Console.Write("ok");
                 AfficherCommandes(conn, date1, date2, "Toujours", idClient);   
             }
 

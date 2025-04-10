@@ -354,14 +354,25 @@ namespace Association
                 MySqlDataReader reader = cmd.ExecuteReader();
                 using (reader)
                 {
+                    // En-tête
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        Console.Write($"{reader.GetName(i),-20}");
+                    }
+                    Console.WriteLine();
+                    Console.WriteLine(new string('-', 20 * reader.FieldCount));
+
+                    // Données
                     while (reader.Read())
                     {
                         for (int i = 0; i < reader.FieldCount; i++)
                         {
-                            Console.Write($"{reader.GetName(i)}: {reader[i]}\t");
+                            Console.Write($"{reader[i],-20}");
                         }
                         Console.WriteLine();
                     }
+
+                    reader.Close();
                 }
             }
             catch (MySqlException e)
@@ -433,7 +444,7 @@ namespace Association
         {
             try
             {
-                string query = "SELECT Plat.NomPlat AS Plat, Plat.IDPlat AS IDPlat, Tiers.Prenom, Tiers.Nom, " +
+                string query = "SELECT Plat.NomPlat AS Plat, Plat.Ingredients AS Ingredients, Plat.IDPlat AS IDPlat, Tiers.Prenom, Tiers.Nom, " +
                     "Tiers.IDTiers AS Identifiant, Tiers.CodePostal AS Arondissement FROM Plat " +
                     "JOIN Tiers ON Plat.IDCuisinier = Tiers.IDTiers " +
                     "WHERE Plat.IDPlat NOT IN (SELECT PlatCommande.IDPlat FROM PlatCommande);";
@@ -442,13 +453,20 @@ namespace Association
                 MySqlDataReader reader = cmd.ExecuteReader();
                 using (reader)
                 {
+                    Console.WriteLine("{0,-20} {1, -35} {2,-8} {3,-10} {4,-12} {5,-12} {6,-10}",
+                        "Plat", "Ingredients", "IDPlat", "Prenom", "Nom", "Identifiant", "Arrondissement");
+                    Console.WriteLine(new string('-', 120));
+
                     while (reader.Read())
                     {
-                        for (int i = 0; i < reader.FieldCount; i++)
-                        {
-                            Console.Write($"{reader.GetName(i)}: {reader[i]}\t");
-                        }
-                        Console.WriteLine();
+                        Console.WriteLine("{0,-20} {1, -35} {2,-8} {3,-10} {4,-12} {5,-12} {6,-10}",
+                            reader["Plat"],
+                            reader["Ingredients"],
+                            reader["IDPlat"],
+                            reader["Prenom"],
+                            reader["Nom"],
+                            reader["Identifiant"],
+                            reader["Arondissement"]);
                     }
                 }
             }
@@ -560,7 +578,6 @@ namespace Association
             }
             else { query += ";"; }
 
-            Console.WriteLine(query);
             MySqlCommand cmd = new MySqlCommand(query, conn);
             MySqlDataReader reader = cmd.ExecuteReader();
             using (reader)

@@ -45,7 +45,7 @@ INSERT INTO Commande VALUES
 (1, '2025-04-03', '12:30:00', 1, 3),
 (2, '2025-03-03', '13:00:00', 2, 6),
 (3, '2025-04-03', '13:30:00', 1, 12),
-(4, '2025-04-04', '14:00:00', 4, 11);
+(4, '2025-04-04', '14:00:00', 4, 11),
 (5, '2025-04-05', '12:00:00', 5, 11),
 (6, '2025-04-05', '19:30:00', 6, 13),
 (7, '2025-04-06', '18:45:00', 3, 6);
@@ -64,3 +64,9 @@ INSERT INTO PlatCommande VALUES
 (6, 8),  -- client 6 commande Paella
 (7, 14), -- client 3 commande Pad Thaï
 (7, 2);  -- client 3 commande Boeuf Bourguignon
+
+SELECT Tiers.Prenom, Tiers.Nom, COUNT(Commande.IDCommande) AS NombreCommandes
+FROM Commande
+JOIN Tiers ON Commande.IDCuisinier = Tiers.IDTiers
+GROUP BY Tiers.IDTiers
+ORDER BY NombreCommandes DESC;
