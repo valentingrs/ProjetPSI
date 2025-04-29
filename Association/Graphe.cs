@@ -1,3 +1,5 @@
+using Google.Protobuf.Collections;
+using Org.BouncyCastle.Asn1.Cmp;
 using System;
 namespace Association
 {
@@ -95,7 +97,7 @@ namespace Association
         #endregion
 
         #region Methodes utiles
-        /// Méthodes plus approfondies
+        /// Méthodes plus approfondies et/ou utiles pour d'autres méthodes
         public Noeud<T> IdentifierNoeud(T nom)
 		// identifie un noeud à partir d'un élément de type rentré (une station par exemple)
         {
@@ -132,6 +134,32 @@ namespace Association
 				}
 			}
 			return liensNoeud;
+		}
+
+		public List<Noeud<T>> ListeDegreDecroissant()
+		{
+			/// liste des sommets par ordre décroissant de degré
+			/// Utile pour l'algorithme de Welsh-Powell
+			List<Noeud<T>> listeSommets = new List<Noeud<T>>();
+			foreach (Noeud<T> noeud in noeuds) { listeSommets.Add(noeud); }
+
+			/// On utilise un tri par séléction pour ne pas trop alourdir le code
+			for (int i = 0; i < listeSommets.Count - 1; i++)
+			{
+				int indiceMin = i;
+				for (int j = i + 1; j < listeSommets.Count; j++)
+				{
+					if (listeSommets[j].Degre() >= listeSommets[i].Degre()) 
+					{
+						indiceMin = j;
+
+						Noeud<T> temp = listeSommets[i];
+						listeSommets[i] = listeSommets[indiceMin];
+						listeSommets[indiceMin] = temp;
+					}
+				}
+			}
+			return listeSommets;
 		}
 
         #endregion
@@ -267,6 +295,71 @@ namespace Association
 			int sommetsVisites = visite.Values.Count(v => v == true); 
 			return sommetsVisites == noeuds.Count;
 		}
+
+        public bool EstBiparti()
+		{
+			return NbChromatique() == 2;
+		}
+
+		public bool EstPlanaire()
+		{
+			return NbChromatique() <= 4; // plutôt regarder en fcontion des cas
+			// et au pire on teste la coloration pour 4 couleurs
+		}
+
+        public Dictionary<Noeud<T>, int> Coloration()
+		{
+			/// Coloration du graphe en utilisant l'algorithme de Welsh-Powell
+			/// Dictionary<Noeud<T>, int> : associe à un sommet une couleur correspodant à un entier
+			Dictionary<Noeud<T>, int> coloration = new Dictionary<Noeud<T>, int>();
+
+			if (oriente == false)
+			{
+				/// coloriable si et seulement si le graphe est non-orienté
+				List<Noeud<T>> listeSommetsDec = ListeDegreDecroissant();
+				
+				int couleurCourante = 0;
+
+				while (listeSommetsDec.Count != 0)
+				{
+					couleurCourante++;
+					Noeud<T> sommetTraite = listeSommetsDec[0];
+
+					coloration.Add(sommetTraite, couleurCourante); /// colorier le sommet avec la couleur courante
+					listeSommetsDec.Remove(sommetTraite); /// on élimine le sommet de la liste des sommets à colorier
+					List<Noeud<T>> voisins = sommetTraite.Voisins; /// liste des voisins du sommet traite
+
+					foreach (Noeud<T> sommet in listeSommetsDec)
+					{
+						if (!voisins.Contains(sommet)) /// si le sommet n'est pas adjacent au sommet qu'on traite
+						{
+							coloration.Add(sommet, couleurCourante); /// alors on le colorie avec la couleur courante
+
+							voisins.AddRange(sommet.Voisins);
+						}
+					}
+
+					foreach (Noeud<T> sommetColorie in coloration.Keys)
+					{
+						listeSommetsDec.Remove(sommetColorie); /// éliminer les sommets coloriés de la liste des sommets à colorier
+					}
+				}
+			}
+
+            return coloration;
+		}
+
+		public int NbChromatique()
+		{
+			Dictionary<Noeud<T>, int> coloration = Coloration();
+			int nbCouleurs = 0;
+			foreach (int couleur in coloration.Values)
+			{
+				if (couleur > nbCouleurs) {  nbCouleurs = couleur;}
+			}
+			return nbCouleurs;
+		}
+
         #endregion
     }
 }

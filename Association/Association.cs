@@ -121,5 +121,35 @@ namespace Association
             //Bellman_Ford(g, g.Noeuds[2], g.Noeuds[4]);
             // mise a jour 
         }
+
+        static public void TestColoration()
+        {
+            Graphe<string> g = new Graphe<string>(false);
+            Noeud<string> A = new Noeud<string>("A"); g.AjouterSommet(A);
+            Noeud<string> B = new Noeud<string>("B"); g.AjouterSommet(B);
+            Noeud<string> C = new Noeud<string>("C"); g.AjouterSommet(C);
+            Noeud<string> D = new Noeud<string>("D"); g.AjouterSommet(D);
+            Noeud<string> E = new Noeud<string>("E"); g.AjouterSommet(E);
+            Noeud<string> F = new Noeud<string>("F"); g.AjouterSommet(F);
+            Noeud<string> G = new Noeud<string>("G"); g.AjouterSommet(G);
+            g.AjouterLien(new Lien<string>(A, D));
+            g.AjouterLien(new Lien<string>(A, F));
+            g.AjouterLien(new Lien<string>(B, C));
+            g.AjouterLien(new Lien<string>(B, E));
+            g.AjouterLien(new Lien<string>(B, G));
+            g.AjouterLien(new Lien<string>(C, D));
+            g.AjouterLien(new Lien<string>(C, E));
+            g.AjouterLien(new Lien<string>(C, F));
+            g.AjouterLien(new Lien<string>(C, G));
+            g.AjouterLien(new Lien<string>(D, E));
+            g.AjouterLien(new Lien<string>(D, F));
+            g.AjouterLien(new Lien<string>(F, G));
+
+
+            int nbChrom = g.NbChromatique();
+            Console.WriteLine("Le graphe est " + nbChrom + "-coloriable");
+            Console.WriteLine("Le graphe est biparti ? " + g.EstBiparti());
+            Console.WriteLine("Le grpahe est planaire ? " + g.EstPlanaire());
+        }
     }
 }

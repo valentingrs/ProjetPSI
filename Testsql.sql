@@ -25,20 +25,21 @@ INSERT INTO Cuisinier VALUES
 
 -- Insertion de 10 plats avec plusieurs par cuisinier
 INSERT INTO Plat VALUES
-(1, 'Entrée', 'Salade César', '2025-04-01', '2025-04-05', 'Française', 'Végétarien', 'Salade, Parmesan, Croutons', 8.50, 1, 3),
-(2, 'Plat', 'Boeuf Bourguignon', '2025-04-01', '2025-04-06', 'Française', 'Omnivore', 'Boeuf, Vin rouge', 15.00, 2, 6),
-(3, 'Plat', 'Lasagnes', '2025-04-01', '2025-04-05', 'Italienne', 'Omnivore', 'Pâtes, Viande, Fromage', 12.00, 2, 11),
-(4, 'Dessert', 'Tiramisu', '2025-04-02', '2025-04-06', 'Italienne', 'Végétarien', 'Mascarpone, Café', 6.00, 1, 11),
-(5, 'Plat', 'Couscous', '2025-04-02', '2025-04-06', 'Marocaine', 'Omnivore', 'Semoule, Légumes, Viande', 13.00, 2, 3),
-(6, 'Entrée', 'Soupe Miso', '2025-04-02', '2025-04-04', 'Japonaise', 'Vegan', 'Miso, Tofu', 5.50, 1, 12),
-(7, 'Dessert', 'Mochi', '2025-04-01', '2025-04-07', 'Japonaise', 'Végétarien', 'Riz gluant, Sucre', 4.50, 1, 12),
-(8, 'Plat', 'Paella', '2025-04-01', '2025-04-06', 'Espagnole', 'Omnivore', 'Riz, Fruits de mer', 14.00, 2, 13),
-(9, 'Dessert', 'Crème brûlée', '2025-04-02', '2025-04-05', 'Française', 'Végétarien', 'Crème, Sucre', 6.00, 1, 3),
-(10, 'Plat', 'Tajine', '2025-04-01', '2025-04-06', 'Marocaine', 'Omnivore', 'Agneau, Abricot', 14.00, 2, 3),
-(11, 'Entrée', 'Bruschetta', '2025-04-03', '2025-04-06', 'Italienne', 'Végétarien', 'Pain, Tomate, Basilic', 5.00, 1, 11),
-(12, 'Plat', 'Ramen', '2025-04-03', '2025-04-07', 'Japonaise', 'Omnivore', 'Nouilles, Bouillon, Porc', 13.50, 2, 12),
-(13, 'Dessert', 'Baklava', '2025-04-03', '2025-04-08', 'Turque', 'Végétarien', 'Pâte filo, Miel, Noix', 6.50, 1, 13),
-(14, 'Plat', 'Pad Thaï', '2025-04-03', '2025-04-07', 'Thaïlandaise', 'Vegan', 'Nouilles, Tofu, Légumes', 11.00, 2, 6);
+(1, 'Salade César', 'Entrée', 'Salade, Parmesan, Croutons', 'Française', 'Végétarien'),
+(2, 'Boeuf Bourguignon', 'Plat', 'Boeuf, Vin rouge', 'Française', 'Omnivore'),
+(3, 'Lasagnes', 'Plat', 'Pâtes, Viande, Fromage', 'Italienne', 'Omnivore'),
+(4, 'Tiramisu', 'Dessert', 'Mascarpone, Café', 'Italienne', 'Végétarien'),
+(5, 'Couscous', 'Plat', 'Semoule, Légumes, Viande', 'Marocaine', 'Omnivore'),
+(6, 'Soupe Miso', 'Entrée', 'Miso, Tofu', 'Japonaise', 'Vegan'),
+(7, 'Mochi', 'Dessert', 'Riz gluant, Sucre', 'Japonaise', 'Végétarien'),
+(8, 'Paella', 'Plat', 'Riz, Fruits de mer', 'Espagnole', 'Omnivore'),
+(9, 'Crème brûlée', 'Dessert', 'Crème, Sucre', 'Française', 'Végétarien'),
+(10, 'Tajine', 'Plat', 'Agneau, Abricot', 'Marocaine', 'Omnivore'),
+(11, 'Bruschetta', 'Entrée', 'Pain, Tomate, Basilic', 'Italienne', 'Végétarien'),
+(12, 'Ramen', 'Plat', 'Nouilles, Bouillon, Porc', 'Japonaise', 'Omnivore'),
+(13, 'Baklava', 'Dessert', 'Pâte filo, Miel, Noix', 'Turque', 'Végétarien'),
+(14, 'Pad Thaï', 'Plat', 'Nouilles, Tofu, Légumes', 'Thaïlandaise', 'Vegan');
+
 
 -- Commandes (au moins un client commande plusieurs plats)
 INSERT INTO Commande VALUES
@@ -64,6 +65,22 @@ INSERT INTO PlatCommande VALUES
 (6, 8),  -- client 6 commande Paella
 (7, 14), -- client 3 commande Pad Thaï
 (7, 2);  -- client 3 commande Boeuf Bourguignon
+
+INSERT INTO PlatCuisinier VALUES
+(1, 1, '2025-04-01', '2025-04-05', NULL, 8.50, 1, 3),
+(2, 2, '2025-04-01', '2025-04-06', NULL, 15.00, 2, 6),
+(3, 3, '2025-04-01', '2025-04-05', NULL, 12.00, 2, 11),
+(4, 4, '2025-04-02', '2025-04-06', NULL, 6.00, 1, 11),
+(5, 5, '2025-04-02', '2025-04-06', NULL, 13.00, 2, 3),
+(6, 6, '2025-04-02', '2025-04-04', NULL, 5.50, 1, 12),
+(7, 7, '2025-04-01', '2025-04-07', NULL, 4.50, 1, 12),
+(8, 8, '2025-04-01', '2025-04-06', NULL, 14.00, 2, 13),
+(9, 9, '2025-04-02', '2025-04-05', NULL, 6.00, 1, 3),
+(10, 10, '2025-04-01', '2025-04-06', NULL, 14.00, 2, 3),
+(11, 11, '2025-04-03', '2025-04-06', NULL, 5.00, 1, 11),
+(12, 12, '2025-04-03', '2025-04-07', NULL, 13.50, 2, 12),
+(13, 13, '2025-04-03', '2025-04-08', NULL, 6.50, 1, 13),
+(14, 14, '2025-04-03', '2025-04-07', NULL, 11.00, 2, 6);
 
 SELECT Tiers.Prenom, Tiers.Nom, COUNT(Commande.IDCommande) AS NombreCommandes
 FROM Commande

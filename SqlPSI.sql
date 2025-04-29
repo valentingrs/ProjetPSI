@@ -26,19 +26,27 @@ CREATE TABLE Cuisinier(
    FOREIGN KEY(IDCuisinier) REFERENCES Tiers(IDTiers)
 );
 
-CREATE TABLE Plat(
+CREATE TABLE Plat (
+	IDPlat INT,
+	NomPlat VARCHAR(50),
+    TypePlat VARCHAR(50),
+    Ingredients VARCHAR(50),
+    Nationalite VARCHAR(50),
+	Regime VARCHAR(50),
+    PRIMARY KEY (IDPlat)
+);
+
+CREATE TABLE PlatCuisinier(
+   IDPlatCuisinier INT,
    IDPlat INT,
-   TypePlat VARCHAR(50),
-   NomPlat VARCHAR(50),
    DateFabrication DATE,
    DatePeremption DATE,
-   Nationalite VARCHAR(50),
-   Regime VARCHAR(50),
-   Ingredients VARCHAR(100),
+   IngredientsSupp VARCHAR(50),
    PrixPlat DECIMAL(15,2),
    NombrePersonnes INT,
    IDCuisinier INT,
-   PRIMARY KEY(IDPlat),
+   PRIMARY KEY(IDPlatCuisinier),
+   FOREIGN KEY(IDPlat) REFERENCES Plat(IDPlat),
    FOREIGN KEY(IDCuisinier) REFERENCES Cuisinier(IDCuisinier)
 );
 
@@ -55,10 +63,10 @@ CREATE TABLE Commande(
 
 CREATE TABLE PlatCommande(
 	IDCommande INT, 
-    IDPlat INT,
-    PRIMARY KEY (IDCommande, IDPlat), /* un plat ne peut être affecté qu'à au plus une commande */
+    IDPlatCuisinier INT,
+    PRIMARY KEY (IDCommande, IDPlatCuisinier), /* un plat ne peut être affecté qu'à au plus une commande */
     FOREIGN KEY (IDCommande) REFERENCES Commande(IDCommande),
-    FOREIGN KEY (IDPlat) REFERENCES Plat(IDPlat)
+    FOREIGN KEY (IDPlatCuisinier) REFERENCES Plat(IDPlat)
 );
 
 CREATE TABLE Entreprise(

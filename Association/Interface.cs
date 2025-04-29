@@ -250,7 +250,7 @@ namespace Association
             Console.WriteLine("Que voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
             Console.WriteLine("1 - Ajouter un cuisinier");
             Console.WriteLine("2 - Supprimer un cuisinier");
-			Console.WriteLine("3 - En tant que cuisinier, ajouter un plat");
+			Console.WriteLine("3 - Ajouter un plat");
             Console.WriteLine("4 - Modifier un cuisinier");
             Console.WriteLine("5 - Afficher les données d'un cuisinier");
             Console.Write("\nChoix : ");

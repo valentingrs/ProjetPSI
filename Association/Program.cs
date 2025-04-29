@@ -4,6 +4,8 @@ using MySql.Data.MySqlClient;
 using OfficeOpenXml;
 using System.ComponentModel;
 using static Association.PlusCourtChemin;
+using static Association.Association;
+
 
 namespace Association
 {
@@ -13,6 +15,8 @@ namespace Association
 "SERVER=127.0.0.1;PORT=3306;DATABASE=LivinParis;UID=root;PASSWORD=root";
         public static void Main(string[] args)
         {
+            //TestColoration();
+
             //TestAlgoGraphes();
             MainInterface();
         }
