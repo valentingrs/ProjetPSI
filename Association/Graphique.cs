@@ -22,7 +22,7 @@ namespace Association
             });
         }
 
-        static private void DessinerGrapheNonOriente<T>(Graphe<T> graphe, string fichierImage)
+        static public void DessinerGrapheNonOriente<T>(Graphe<T> graphe, string fichierImage)
         {
             const int largeurImage = 1000;
             const int hauteurImage = 1000;
@@ -222,6 +222,104 @@ namespace Association
 
             canvas.DrawLine(fin, p1, paint);
             canvas.DrawLine(fin, p2, paint);
+        }
+
+        static public void GrapheColorationSommets<T>(Graphe<T> graphe, Dictionary<Noeud<T>, int> coloration, string fichierImage)
+        {
+            if (graphe.Oriente)
+            {
+                Console.WriteLine("La coloration ne s'applique qu'aux graphes non orientés.");
+                return;
+            }
+
+            const int largeurImage = 1000;
+            const int hauteurImage = 1000;
+
+            // Palette de couleurs de base
+            SKColor[] palette = new SKColor[]
+            {
+        SKColors.Red, SKColors.Green, SKColors.Blue, SKColors.Orange, SKColors.Purple,
+        SKColors.Brown, SKColors.Cyan, SKColors.Magenta, SKColors.Yellow, SKColors.Gray
+            };
+
+            using (var bitmap = new SKBitmap(largeurImage, hauteurImage))
+            using (var canvas = new SKCanvas(bitmap))
+            {
+                canvas.Clear(SKColors.White);
+
+                SKPaint lienPaint = new SKPaint
+                {
+                    Color = SKColors.Black,
+                    StrokeWidth = 2,
+                    IsAntialias = true
+                };
+
+                SKPaint textPaint = new SKPaint
+                {
+                    Color = SKColors.Black,
+                    TextSize = 30,
+                    IsAntialias = true
+                };
+
+                // Position des sommets en cercle
+                Dictionary<Noeud<T>, SKPoint> positions = new Dictionary<Noeud<T>, SKPoint>();
+                int angleStep = 360 / graphe.Noeuds.Count;
+                int rayon = 450;
+                SKPoint centre = new SKPoint(largeurImage / 2, hauteurImage / 2);
+                int angle = 0;
+
+                foreach (Noeud<T> noeud in graphe.Noeuds)
+                {
+                    float x = centre.X + rayon * (float)Math.Cos(Math.PI * angle / 180);
+                    float y = centre.Y + rayon * (float)Math.Sin(Math.PI * angle / 180);
+                    positions[noeud] = new SKPoint(x, y);
+                    angle += angleStep;
+                }
+
+                // Dessiner les liens
+                foreach (Lien<T> lien in graphe.Liens)
+                {
+                    if (positions.ContainsKey(lien.Noeud1) && positions.ContainsKey(lien.Noeud2))
+                    {
+                        SKPoint p1 = positions[lien.Noeud1];
+                        SKPoint p2 = positions[lien.Noeud2];
+                        canvas.DrawLine(p1, p2, lienPaint);
+                    }
+                }
+
+                // Dessiner les sommets avec couleur
+                foreach (var kvp in positions)
+                {
+                    Noeud<T> noeud = kvp.Key;
+                    SKPoint position = kvp.Value;
+
+                    int couleurIndex = coloration.ContainsKey(noeud) ? coloration[noeud] % palette.Length : 0;
+                    SKPaint sommetPaint = new SKPaint
+                    {
+                        Color = palette[couleurIndex],
+                        IsAntialias = true,
+                        Style = SKPaintStyle.Fill
+                    };
+
+                    canvas.DrawCircle(position, 20, sommetPaint);
+                    canvas.DrawText(noeud.Nom.ToString(), position.X - 10, position.Y + 10, textPaint);
+                }
+
+                // Sauvegarder
+                using (var image = SKImage.FromBitmap(bitmap))
+                using (var data = image.Encode())
+                using (var stream = File.OpenWrite(fichierImage))
+                {
+                    data.SaveTo(stream);
+                }
+
+                string cheminImage = Path.GetFullPath(fichierImage);
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = cheminImage,
+                    UseShellExecute = true
+                });
+            }
         }
     }
 }

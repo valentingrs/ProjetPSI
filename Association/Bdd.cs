@@ -511,6 +511,77 @@ namespace Association
 
             return prixC;
         }
+
+
+        /// utile pour GrapheTiers 
+        public struct Commande
+        {
+            public int idCommande;
+            public int idClient;
+            public int idCuisinier;
+        }
+
+        public static List<int> RecupererTiers(MySqlConnection conn)
+        {
+            List<int> listeIDTiers = new List<int>();
+            try
+            {
+                string queryTiers = "SELECT IDTiers FROM Tiers;";
+                MySqlCommand cmd = new MySqlCommand(queryTiers, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                using (reader)
+                {
+                    while (reader.Read())
+                    {
+                        int idTiers = (int)reader["IDTiers"];
+
+                        listeIDTiers.Add(idTiers);
+                    }
+                    
+                }
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine($"Erreur MySQL : {e.Message}");
+            }
+            return listeIDTiers;
+        }
+        public static List<Commande> RecupererCommande(MySqlConnection conn)
+        {
+
+            List<Commande> commandes = new List<Commande>();
+
+            try
+            {
+                string query = "SELECT IDCommande, IDClient, IDCuisinier FROM Commande;";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                using (reader)
+                {
+                    while (reader.Read())
+                    {
+                        int idCommande = Convert.ToInt32(reader["IDCommande"]);
+                        int idClient = Convert.ToInt32(reader["IDClient"]);
+                        int idCuisinier = Convert.ToInt32(reader["IDCuisinier"]);
+
+                        Commande commande = new Commande();
+                        commande.idCommande = idCommande;
+                        commande.idClient = idClient;
+                        commande.idCuisinier = idCuisinier;
+
+                        commandes.Add(commande);
+                    }
+                    
+                }
+            }
+
+            catch (MySqlException e)
+            {
+                Console.WriteLine($"Erreur MySQL : {e.Message}");
+            }
+            return commandes;
+                
+        }
         #endregion
 
         #region Statistiques

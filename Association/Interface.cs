@@ -17,6 +17,7 @@ namespace Association
 
 		static void Menu()
 		{
+            
 			Console.WriteLine("LIVIN PARIS\n\n");
 			Console.WriteLine("-> Module Tiers\n-> Module Client\n-> Module Cuisinier\n-> Module Commande\n-> Module Statistiques\n");
 		}
