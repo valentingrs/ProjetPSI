@@ -1,19 +1,20 @@
 -- Insertion dans Tiers : Clients et Cuisiniers (dont 2 sont les deux)
 INSERT INTO Tiers VALUES
-(1, '75001', 'Paris', 'alice@mail.com', '0102030405', 'Dupont', '1 rue de Paris', 'Alice'),
-(2, '75002', 'Paris', 'bob@mail.com', '0102030406', 'Durand', '2 rue de Lyon', 'Bob'),
-(3, '75003', 'Paris', 'carol@mail.com', '0102030407', 'Moreau', '3 rue de Rome', 'Carol'),
-(4, '75004', 'Paris', 'dave@mail.com', '0102030408', 'Bernard', '4 rue de Madrid', 'Dave'),
-(5, '75005', 'Paris', 'eve@mail.com', '0102030409', 'Petit', '5 rue de Londres', 'Eve'),
-(6, '75006', 'Paris', 'frank@mail.com', '0102030410', 'Noel', '6 rue d’Athènes', 'Frank'),
-(7, '75007', 'Paris', 'grace@mail.com', '0102030411', 'Legrand', '7 rue de Rome', 'Grace'),
-(8, '75008', 'Paris', 'hugo@mail.com', '0102030412', 'Lemoine', '8 rue d’Amsterdam', 'Hugo'),
-(9, '75009', 'Paris', 'irene@mail.com', '0102030413', 'Renard', '9 rue de Londres', 'Irène'),
-(10, '75010', 'Paris', 'john@mail.com', '0102030414', 'Martin', '10 rue de Berlin', 'John');
+(1, 'root', '75000', 'Paris', 'admin@mail.com', '0104050602', 'Root', 'Pole Leonard de Vinci', 'Admin'), # compte administrateur
+(2, 'motdepasse2', '75002', 'Paris', 'bob@mail.com', '0102030406', 'Durand', '2 rue de Lyon', 'Bob'),
+(3, 'motdepasse3', '75003', 'Paris', 'carol@mail.com', '0102030407', 'Moreau', '3 rue de Rome', 'Carol'),
+(4, 'motdepasse4', '75004', 'Paris', 'dave@mail.com', '0102030408', 'Bernard', '4 rue de Madrid', 'Dave'),
+(5, 'motdepasse5', '75005', 'Paris', 'eve@mail.com', '0102030409', 'Petit', '5 rue de Londres', 'Eve'),
+(6, 'motdepasse6', '75006', 'Paris', 'frank@mail.com', '0102030410', 'Noel', '6 rue d’Athènes', 'Frank'),
+(7, 'motdepasse7', '75007', 'Paris', 'grace@mail.com', '0102030411', 'Legrand', '7 rue de Rome', 'Grace'),
+(8, 'motdepasse8', '75008', 'Paris', 'hugo@mail.com', '0102030412', 'Lemoine', '8 rue d’Amsterdam', 'Hugo'),
+(9, 'motdepasse9', '75009', 'Paris', 'irene@mail.com', '0102030413', 'Renard', '9 rue de Londres', 'Irène'),
+(10, 'motdepasse10', '75010', 'Paris', 'john@mail.com', '0102030414', 'Martin', '10 rue de Berlin', 'John');
 INSERT INTO Tiers VALUES
-(11, '75011', 'Paris', 'chef1@mail.com', '0102030415', 'Gault', '11 rue du Chef', 'Michel'),
-(12, '75012', 'Paris', 'chef2@mail.com', '0102030416', 'Millau', '12 rue du Chef', 'Paul'),
-(13, '75013', 'Paris', 'chef3@mail.com', '0102030417', 'Robuchon', '13 rue du Chef', 'Joël');
+(11, 'motdepasse11', '75011', 'Paris', 'chef1@mail.com', '0102030415', 'Gault', '11 rue du Chef', 'Michel'),
+(12, 'motdepasse12', '75012', 'Paris', 'chef2@mail.com', '0102030416', 'Millau', '12 rue du Chef', 'Paul'),
+(13, 'motdepasse13', '75013', 'Paris', 'chef3@mail.com', '0102030417', 'Robuchon', '13 rue du Chef', 'Joël'),
+(14, 'motdepasse1', '75001', 'Paris', 'alice@mail.com', '0102030405', 'Dupont', '1 rue de Paris', 'Alice');
 
 -- Insertion Clients (IDs 1 à 10)
 INSERT INTO Client VALUES
@@ -82,8 +83,3 @@ INSERT INTO PlatCuisinier VALUES
 (13, 13, '2025-04-03', '2025-04-08', NULL, 6.50, 1, 13),
 (14, 14, '2025-04-03', '2025-04-07', NULL, 11.00, 2, 6);
 
-SELECT Tiers.Prenom, Tiers.Nom, COUNT(Commande.IDCommande) AS NombreCommandes
-FROM Commande
-JOIN Tiers ON Commande.IDCuisinier = Tiers.IDTiers
-GROUP BY Tiers.IDTiers
-ORDER BY NombreCommandes DESC;

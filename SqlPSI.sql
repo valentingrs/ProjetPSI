@@ -4,6 +4,7 @@ USE LivinParis;
 
 CREATE TABLE Tiers(
    IDTiers INT,
+   MotDePasse VARCHAR(50),
    CodePostal VARCHAR(5),
    Ville VARCHAR(50),
    Email VARCHAR(50),
@@ -11,19 +12,19 @@ CREATE TABLE Tiers(
    Nom VARCHAR(50),
    Adresse VARCHAR(70),
    Prenom VARCHAR(50),
-   PRIMARY KEY(IDTiers)
+   PRIMARY KEY(IDTiers, Email)
 );
 
 CREATE TABLE Client(
    IDClient INT,
    PRIMARY KEY(IDClient),
-   FOREIGN KEY(IDClient) REFERENCES Tiers(IDTiers)
+   FOREIGN KEY(IDClient) REFERENCES Tiers(IDTiers) ON DELETE CASCADE
 );
 
 CREATE TABLE Cuisinier(
    IDCuisinier INT,
    PRIMARY KEY(IDCuisinier),
-   FOREIGN KEY(IDCuisinier) REFERENCES Tiers(IDTiers)
+   FOREIGN KEY(IDCuisinier) REFERENCES Tiers(IDTiers) ON DELETE CASCADE
 );
 
 CREATE TABLE Plat (
@@ -33,7 +34,7 @@ CREATE TABLE Plat (
     Ingredients VARCHAR(50),
     Nationalite VARCHAR(50),
 	Regime VARCHAR(50),
-    PRIMARY KEY (IDPlat)
+    PRIMARY KEY (IDPlat) 
 );
 
 CREATE TABLE PlatCuisinier(
@@ -46,8 +47,8 @@ CREATE TABLE PlatCuisinier(
    NombrePersonnes INT,
    IDCuisinier INT,
    PRIMARY KEY(IDPlatCuisinier),
-   FOREIGN KEY(IDPlat) REFERENCES Plat(IDPlat),
-   FOREIGN KEY(IDCuisinier) REFERENCES Cuisinier(IDCuisinier)
+   FOREIGN KEY(IDPlat) REFERENCES Plat(IDPlat) ON DELETE CASCADE,
+   FOREIGN KEY(IDCuisinier) REFERENCES Cuisinier(IDCuisinier) ON DELETE CASCADE
 );
 
 CREATE TABLE Commande(
@@ -57,31 +58,31 @@ CREATE TABLE Commande(
    IDClient INT NOT NULL,
    IDCuisinier INT NOT NULL,
    PRIMARY KEY(IDCommande),
-   FOREIGN KEY(IDClient) REFERENCES Client(IDClient),
-   FOREIGN KEY(IDCuisinier) REFERENCES Cuisinier(IDCuisinier)
+   FOREIGN KEY(IDClient) REFERENCES Client(IDClient) ON DELETE CASCADE,
+   FOREIGN KEY(IDCuisinier) REFERENCES Cuisinier(IDCuisinier) ON DELETE CASCADE
 );
 
 CREATE TABLE PlatCommande(
 	IDCommande INT, 
     IDPlatCuisinier INT,
     PRIMARY KEY (IDCommande, IDPlatCuisinier), /* un plat ne peut être affecté qu'à au plus une commande */
-    FOREIGN KEY (IDCommande) REFERENCES Commande(IDCommande),
-    FOREIGN KEY (IDPlatCuisinier) REFERENCES Plat(IDPlat)
+    FOREIGN KEY (IDCommande) REFERENCES Commande(IDCommande) ON DELETE CASCADE, 
+    FOREIGN KEY (IDPlatCuisinier) REFERENCES Plat(IDPlat) ON DELETE CASCADE
 );
 
 CREATE TABLE Entreprise(
    NomEntreprise VARCHAR(50),
    IDTiers INT NOT NULL,
    PRIMARY KEY(NomEntreprise),
-   FOREIGN KEY(IDTiers) REFERENCES Client(IDClient)
+   FOREIGN KEY(IDTiers) REFERENCES Client(IDClient) ON DELETE CASCADE
 );
 
 CREATE TABLE cuisine(
    IDTiers INT,
    IDPlat INT,
    PRIMARY KEY(IDTiers, IDPlat),
-   FOREIGN KEY(IDTiers) REFERENCES Cuisinier(IDCuisinier),
-   FOREIGN KEY(IDPlat) REFERENCES Plat(IDPlat)
+   FOREIGN KEY(IDTiers) REFERENCES Cuisinier(IDCuisinier) ON DELETE CASCADE,
+   FOREIGN KEY(IDPlat) REFERENCES Plat(IDPlat) ON DELETE CASCADE
 );
 
 CREATE TABLE sert(
@@ -89,6 +90,6 @@ CREATE TABLE sert(
    IDTiers_1 INT,
    Note INT,
    PRIMARY KEY(IDTiers, IDTiers_1),
-   FOREIGN KEY(IDTiers) REFERENCES Client(IDClient),
-   FOREIGN KEY(IDTiers_1) REFERENCES Cuisinier(IDCuisinier)
+   FOREIGN KEY(IDTiers) REFERENCES Client(IDClient) ON DELETE CASCADE,
+   FOREIGN KEY(IDTiers_1) REFERENCES Cuisinier(IDCuisinier) ON DELETE CASCADE
 );

@@ -3,6 +3,7 @@ using static Association.Bdd;
 using MySql.Data.MySqlClient;
 using System.Text;
 using System.Security.Cryptography.X509Certificates;
+using System.ComponentModel.DataAnnotations;
 
 namespace Association
 {
@@ -11,24 +12,62 @@ namespace Association
 		public static void GererInterface(MySqlConnection conn)
 		{
 			Console.Clear();
-			Menu();
-			ChoixModule(conn);
+			int idCompteActif = MenuConnexion(conn);
+			ChoixModule(conn, idCompteActif);
 		}
 
-		static void Menu()
+		static int MenuConnexion(MySqlConnection conn)
 		{
-            
-			Console.WriteLine("LIVIN PARIS\n\n");
-			Console.WriteLine("-> Module Tiers\n-> Module Client\n-> Module Cuisinier\n-> Module Commande\n-> Module Statistiques\n");
+            int idCompteConnecte = 0; /// id par défaut, en principe jamais attribué
+
+            Console.WriteLine("LIVIN'PARIS \n\n");
+            bool connecte = false;
+
+            while (connecte == false)
+            {
+                Console.Write("Avez-vous déjà un compte existant Oui (O) / Non (N) ? ");
+                string choix = Console.ReadLine().ToLower().Trim();
+
+                while (choix != "o" && choix != "n")
+                {
+                    Console.Write("Avez-vous déjà un compte existant Oui (O) / Non (N) ? ");
+                    choix = Console.ReadLine().ToLower().Trim();
+                }
+
+
+                if (choix == "n")
+                {
+                    AjouterUnCompte(conn);
+
+                }
+                
+                if (choix == "o")
+                {
+                    Console.Write("\n\nEntrer un identifiant de connexion (email) : "); string email = Console.ReadLine().Trim();
+                    Console.Write("Entrer un mot de passe : "); string motdepasse = Console.ReadLine();
+                    connecte = VerfierConnexion(conn, email, motdepasse);
+                    if (connecte == true) { idCompteConnecte = RecupIdMail(conn, email); Console.Clear(); }
+                }
+            }
+            return idCompteConnecte;
 		}
 
-        static void InterfaceModifierCompte(MySqlConnection conn, string type)
+
+        static void InterfaceModifierCompte(MySqlConnection conn, string type, int idCompteModif=0)
         {
             Console.Write("\nModfier un compte ");
             if (type == "Client") { Console.WriteLine("client : "); }
             if (type == "Cuisinier") { Console.WriteLine("cuisinier : "); }
-            Console.Write("Entrer l'id du compte à modiifer : "); int idTiers = Convert.ToInt32(Console.ReadLine());
-
+            if (type == "Tiers") { Console.WriteLine("tiers : "); }
+            int idTiers;
+            if (idCompteModif == 0)
+            {
+                Console.Write("Entrer l'id du compte à modiifer : "); idTiers = Convert.ToInt32(Console.ReadLine());
+            }
+            else
+            {
+                idTiers = idCompteModif;
+            }
             if (!Existe(conn, type, "ID"+type, idTiers)) { Console.WriteLine("Compte " + type + " inexistant !"); }
             else
             {
@@ -64,97 +103,201 @@ namespace Association
             }
         }
 
-		static void ChoixModule(MySqlConnection conn)
+		static void ChoixModule(MySqlConnection conn, int idCompteActif)
 		{
-			Console.Write("Choisir un module : ");
+			Console.WriteLine("LIVIN PARIS\n\n");
+            Console.WriteLine("Connecté. Bievenue sur votre compte LIVIN'PARIS");
+            Console.WriteLine("-> 1 : Paramètres du compte\n-> 2 : Interface Client\n-> 3 : Interface Cuisinier\n-> 4 : Gérer les commandes\n-> 5 : Quelques statistiques\n-> 6 : Paramètres administrateur");
+       
+            Console.Write("Choisir un module (rentrer le chiffre associé) : ");
 			string mod = (Console.ReadLine()).ToLower().Trim();
-			while (mod != "tiers" && mod != "client" && mod != "cuisinier" && mod != "commande" && mod != "statistiques")
+			while (mod != "1" && mod != "2" && mod != "3" && mod != "4" && mod != "5" && mod != "6")
 			{
-				Console.WriteLine("Rentrer un nom valide de module");
+				Console.WriteLine("Rentrer un nombre valide");
 				Console.Write("Choisir un module : ");
 				mod = (Console.ReadLine()).ToLower().Trim();
 			}
 			
 			switch (mod)
 			{
-				case "tiers":
-					ModuleTiers(conn); break;
-				case "client":
-					ModuleClient(conn); break;
-				case "cuisinier":
-					ModuleCuisinier(conn); break;
-				case "commande":
-					ModuleCommande(conn); break;
-				case "statistiques":
-					ModuleStatistiques(conn); break;
-			}
+				case "1":
+					ModuleTiers(conn, idCompteActif); break;
+				case "2":
+					ModuleClient(conn, idCompteActif); break;
+				case "3":
+					ModuleCuisinier(conn, idCompteActif); break;
+				case "4":
+					ModuleCommande(conn, idCompteActif); break;
+				case "5":
+					ModuleStatistiques(conn, idCompteActif); break;
+                case "6":
+                    ModuleAdmin(conn, idCompteActif); break;
+            }
 		}
 
-		static void RetourMenu(MySqlConnection conn)
-		{
-			GererInterface(conn);
+		static void RetourMenu(MySqlConnection conn, int idCompteActif)
+        {
+            Console.Clear();
+			ChoixModule(conn, idCompteActif);
 		}
 
-		static void ModuleTiers(MySqlConnection conn)
+        static void AjouterUnCompte(MySqlConnection conn)
+        {
+            Console.WriteLine("\nCréation d'un compte : ");
+            int idTiers = new Random().Next(1, 1001);
+            while (Existe(conn, "Tiers", "IDTiers", idTiers)) { idTiers = new Random().Next(1, 1001); }
+
+            Console.Write("Entrer une adresse mail: "); string email = Console.ReadLine();
+            while (Existe(conn, "Tiers", "Email", email)) { Console.WriteLine("Mail déjà existant. Rentrez un nouvel email: "); email = Console.ReadLine(); }
+            Console.Write("Entrer un mot de passe : "); string mdp = Console.ReadLine();
+            Console.Write("Entrer un nom : "); string nom = Console.ReadLine(); nom = nom.Replace("'", "''"); /// pour éviter les conflits avec les apostrophes dans les données
+            Console.Write("Entrer un prénom : "); string prenom = Console.ReadLine();
+            Console.Write("Entrer un code postal : "); string cp = Console.ReadLine();
+            Console.Write("Entrer une ville : "); string ville = Console.ReadLine(); ville = ville.Replace("'", "''");
+            Console.Write("Entrer une adresse : "); string adresse = Console.ReadLine(); adresse = adresse.Replace("'", "''");
+
+            
+
+            Console.Write("Entrer un numéro de téléphone : "); string tel = Console.ReadLine();
+            CreerUnCompte(conn, idTiers, mdp, cp, ville, email, tel, nom, adresse, prenom);
+        }
+
+
+		static void ModuleTiers(MySqlConnection conn, int idCompteActif)
 		{
-            Console.Clear(); Console.WriteLine("Bienvenue sur le module tiers\n");
+            Console.Clear(); Console.WriteLine("Paramètres du compte\n");
 
             Console.WriteLine("Que voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
-            Console.WriteLine("1 - Ajouter un compte");
-			Console.WriteLine("2 - Supprimer un compte");
-            Console.WriteLine("3 - Modifier un compte");
+            Console.WriteLine("1 - Modifier mon compte");
+			Console.WriteLine("2 - Supprimer mon compte");
+            Console.WriteLine("3 - Se déconnecter");
             Console.Write("\nChoix : ");
             string choix = Console.ReadLine();
             while (choix != "1" && choix != "2" && choix != "3" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
 			while (choix != "r")
 			{
-                if (choix == "1")
+                if (choix == "3")
                 {
-                    Console.WriteLine("\nCréation d'un compte : ");
-                    Console.Write("Entrer un id : "); int idTiers = Convert.ToInt32(Console.ReadLine());
-                    if (Existe(conn, "Tiers", "IDTiers", idTiers)) { Console.WriteLine("Compte déjà existant !");}
-                    else
-                    {
-                        Console.Write("Entrer un nom : "); string nom = Console.ReadLine(); nom = nom.Replace("'", "''"); // pour éviter les conflits avec les apostrophes dans les données
-                        Console.Write("Entrer un prénom : "); string prenom = Console.ReadLine();
-                        Console.Write("Entrer un code postal : "); string cp = Console.ReadLine();
-                        Console.Write("Entrer une ville : "); string ville = Console.ReadLine(); ville = ville.Replace("'", "''");
-                        Console.Write("Entrer une adresse : "); string adresse = Console.ReadLine(); adresse = adresse.Replace("'", "''");
-                        Console.Write("Entrer une adresse mail: "); string email = Console.ReadLine();
-                        Console.Write("Entrer un numéro de téléphone : "); string tel = Console.ReadLine();
-                        CreerUnCompte(conn, idTiers, cp, ville, email, tel, nom, adresse, prenom);
-                    }
+                    Console.Clear();
+                    MenuConnexion(conn);
+                    GererInterface(conn); /// appel récursif finalement
+                    /// après il n'y pas réellement de risque de rappels infinis car on imagine bien qu'une fois que
+                    /// l'utilisateur quitte l'application tout s'arrête et lorsqu'il se déconnecte et reconnecte
+                    /// ce ne sera pas un nombre très grand de fois
+
                 }
 
 				if (choix == "2")
 				{
-					Console.WriteLine("\nSupprimer un compte : ");
-					Console.WriteLine("Entrer l'id du compte : "); int idTiers = Convert.ToInt32(Console.ReadLine());
-                    if (!Existe(conn, "Tiers", "IDTiers", idTiers)) { Console.WriteLine("Compte inexistant !"); }
-                    else { SupprimerUnCompte(conn, "Tiers", idTiers); }
-
+					Console.WriteLine("\nSupprimer du compte : ");
+                    if (!Existe(conn, "Tiers", "IDTiers", idCompteActif)) { Console.WriteLine("Compte inexistant !"); }
+                    else { SupprimerUnCompte(conn, "Tiers", idCompteActif); GererInterface(conn); }
                 }
                 
-                if (choix == "3")
+                if (choix == "1")
                 {
-                    InterfaceModifierCompte(conn, "Tiers");
+                    InterfaceModifierCompte(conn, "Tiers", idCompteActif);
                 }
+
                 Console.Write("\nChoix : ");
                 choix = Console.ReadLine();
                 while (choix != "1" && choix != "2" && choix != "3" && choix != "r") { Console.Write("\nRentrer un choix valide : "); choix = Console.ReadLine(); }
             }
-            RetourMenu(conn);
+            RetourMenu(conn, idCompteActif);
         }
 
-		static void ModuleClient(MySqlConnection conn)
+        static void ModuleAdmin(MySqlConnection conn, int idCompteActif)
+        {
+
+            if (idCompteActif != 1)
+            {
+                Console.Clear();
+                Console.WriteLine("Accès impossible à cette page, vous n'êtes pas un compte administrateur");
+                Console.WriteLine("Retour au menu : ");
+                object retourMenu = Console.ReadLine(); /// quand l'utilisateur clique sur entrée il retourne automatiquement au menu
+                RetourMenu(conn, idCompteActif);
+            }
+            else
+            {
+                Console.Clear(); Console.WriteLine("Paramètres administrateur\n");
+
+                Console.WriteLine("Que voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
+                Console.WriteLine("1 - Modifier un compte");
+                Console.WriteLine("2 - Supprimer un compte");
+                Console.WriteLine("3 - Ajouter un compte client");
+                Console.WriteLine("4 - Suppression d'un compte client");
+                Console.Write("\nChoix : ");
+                string choix = Console.ReadLine();
+                while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+                while (choix != "r")
+                {
+                    if (choix == "1")
+                    {
+                        InterfaceModifierCompte(conn, "Tiers");
+                    }
+                    else if (choix == "2")
+                    {
+                        Console.WriteLine("\nSupprimer un compte : ");
+                        Console.WriteLine("Entrer l'id du compte : "); 
+                        int idTiers = Convert.ToInt32(Console.ReadLine());
+                        if (!Existe(conn, "Tiers", "IDTiers", idTiers)) { Console.WriteLine("Compte inexistant !"); }
+                        else { SupprimerUnCompte(conn, "Tiers", idTiers); }
+                    }
+
+                    else if (choix == "3")
+                    {
+                        Console.WriteLine("\nCréation d'un client : ");
+                        Console.Write("Entrer le mail du compte Tiers : "); string email = Console.ReadLine();
+                        while (!Existe(conn, "Tiers", "Email", email)) { Console.Write("\nEntrer le mail du compte Tiers : "); email = Console.ReadLine(); }
+                        int idClient = RecupIdMail(conn, Console.ReadLine());
+                        bool clientExiste = Existe(conn, "Client", "IDClient", idClient);
+
+                        while (clientExiste == true)
+                        {
+                            Console.Write("Entrer le mail du compte Tiers : "); email = Console.ReadLine();
+                            while (!Existe(conn, "Tiers", "Email", email)) { Console.Write("\nEntrer le mail du compte Tiers : "); email = Console.ReadLine(); }
+                            idClient = RecupIdMail(conn, Console.ReadLine());
+                            clientExiste = Existe(conn, "Client", "IDClient", idClient);
+                        }
+                        AjouterClient(true, idClient, conn);
+                    }
+
+                    else if (choix == "4")
+                    {
+                        Console.WriteLine("\nSuppression d'un client : ");
+                        Console.Write("Entrer l'id du compte Client à supprimer : "); int idClient = Convert.ToInt32(Console.ReadLine());
+
+                        bool clientExiste = Existe(conn, "Client", "IDClient", idClient);
+                        bool tiersExiste = Existe(conn, "Tiers", "IDTiers", idClient);
+                        if (clientExiste == false || tiersExiste == false)
+                        {
+                            Console.WriteLine("Compte tiers inexistant ou compte client inexistant");
+
+                        }
+                        else
+                        {
+                            SupprimerClient(conn, "Client", idClient);
+
+                        }
+                    }
+                    Console.Write("\nChoix : ");
+                    choix = Console.ReadLine();
+                    while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "r") { Console.Write("\nRentrer un choix valide : "); choix = Console.ReadLine(); }
+                }
+                RetourMenu(conn, idCompteActif);
+            }
+            
+        }
+
+		static void ModuleClient(MySqlConnection conn, int idCompteActif)
 		{
 			Console.Clear(); Console.WriteLine("Bienvenue sur le module client\n");
 
 			Console.WriteLine("Que voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
-			Console.WriteLine("1 - Ajouter un client");
-            Console.WriteLine("2 - Supprimer un client");
-            Console.WriteLine("3 - Afficher les clients");
-            Console.WriteLine("4 - Modifier un client");
+			Console.WriteLine("1 - Devenir client");
+            Console.WriteLine("2 - Supprimer mon compte client");
+            Console.WriteLine("3 - Afficher les autres clients");
+            Console.WriteLine("4 - Modifier mon compte client");
             Console.Write("\nChoix : ");
 			string choix = Console.ReadLine();
 			while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
@@ -164,37 +307,19 @@ namespace Association
                 if (choix == "1")
                 {
                     Console.WriteLine("\nCréation d'un client : ");
-                    Console.Write("Entrer l'id du compte Tiers : "); int idClient = Convert.ToInt32(Console.ReadLine());
-                    bool clientExiste = Existe(conn, "Client", "IDClient", idClient);
-                    bool tiersExiste = Existe(conn, "Tiers", "IDTiers", idClient);
-                    while (tiersExiste == false || clientExiste == true)
-                    {
-                        Console.WriteLine("Compte tiers inexistant ou compte client déjà existant, rentrer un nouvel id");
-                        Console.Write("Entrer l'id du compte Tiers : "); idClient = Convert.ToInt32(Console.ReadLine());
-                        tiersExiste = Existe(conn, "Tiers", "IDTiers", idClient);
-                        clientExiste = Existe(conn, "Client", "IDClient", idClient);
-                    }
-                    AjouterClient(true, idClient, conn);
-                    
+                    bool clientExiste = Existe(conn, "Client", "IDClient", idCompteActif);
+
+                    if (clientExiste) { Console.WriteLine("Vous êtes déjà client !"); }
+                    else { AjouterClient(true, idCompteActif, conn); }
                 }
 
                 if (choix == "2")
                 {
                     Console.WriteLine("\nSuppression d'un client : ");
-                    Console.Write("Entrer l'id du compte Tiers pour supprimer : "); int idClient = Convert.ToInt32(Console.ReadLine());
-
-                    bool clientExiste = Existe(conn, "Client", "IDClient", idClient);
-                    bool tiersExiste = Existe(conn, "Tiers", "IDTiers", idClient);
-                    if (clientExiste == false || tiersExiste == false)
-                    {
-                        Console.WriteLine("Compte tiers inexistant ou compte client inexistant");
-                       
-                    }
-                    else
-                    {
-                        SupprimerClient(conn, "Client", idClient);
-
-                    }
+                    bool clientExiste = Existe(conn, "Client", "IDClient", idCompteActif);
+                    
+                    if (clientExiste) { SupprimerClient(conn, "Client", idCompteActif); }
+                    else { Console.WriteLine("Vous n'êtes pas client, veuillez créér un compte client"); }
                 }
 
                 if (choix == "3")
@@ -204,16 +329,20 @@ namespace Association
 
                 if (choix == "4")
                 {
-                    InterfaceModifierCompte(conn, "Client");
+                    if (Existe(conn, "Client", "IDClient", idCompteActif))
+                    {
+                        InterfaceModifierCompte(conn, "Client", idCompteActif);
+                    }
+                    else { Console.WriteLine("Vous n'êtes pas client. Veuillez à créér un compte client"); }
                 }
 
                 Console.WriteLine("\nQue voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
-                Console.WriteLine("1 - Ajouter un client\n2 - Supprimer un client\n3 - Afficher les clients\n4 - Modifier un client");
+                Console.WriteLine("1 - Devenir client\n2 - Supprimer mon compte client\n3 - Afficher les autres clients\n4 - Modifier mon compte client");
                 Console.Write("Choix : ");
                 choix = Console.ReadLine();
                 while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
             }
-            RetourMenu(conn);
+            RetourMenu(conn, idCompteActif);
         }
 
         static void AffichageClients(MySqlConnection conn)
@@ -244,100 +373,99 @@ namespace Association
         }
 
 
-        static void ModuleCuisinier(MySqlConnection conn)
+        static void ModuleCuisinier(MySqlConnection conn, int idCompteActif)
 		{
             Console.Clear(); Console.WriteLine("Bienvenue sur le module cuisinier\n");
 
             Console.WriteLine("Que voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
-            Console.WriteLine("1 - Ajouter un cuisinier");
+            Console.WriteLine("1 - Devenir cuisinier");
             Console.WriteLine("2 - Supprimer un cuisinier");
-			Console.WriteLine("3 - Ajouter un plat");
-            Console.WriteLine("4 - Modifier un cuisinier");
-            Console.WriteLine("5 - Afficher les données d'un cuisinier");
+			Console.WriteLine("3 - Proposer un nouveau plat");
+            Console.WriteLine("4 - Afficher mes plats proposés ");
+            Console.WriteLine("5 - Modifier mon compte cuisinier");
+            Console.WriteLine("6 - Afficher les données d'un cuisinier");
             Console.Write("\nChoix : ");
             string choix = Console.ReadLine();
             while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && 
-                choix != "5" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+                choix != "5" && choix != "6" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
 
             while (choix != "r")
             {
                 if (choix == "1")
                 {
-                    Console.WriteLine("\nCréation d'un cuisinier : ");
-                    Console.Write("Entrer l'id du compte Tiers : "); int id = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("\nActivation de votre compte cuisinier : ");
+                    bool clientExiste = Existe(conn, "Cuisinier", "IDCuisinier", idCompteActif);
 
-                    bool cuisinierExiste = Existe(conn, "Cuisinier", "IDCuisinier", id);
-                    bool tiersExiste = Existe(conn, "Tiers", "IDTiers", id);
-                    while (tiersExiste == false || cuisinierExiste == true)
-                    {
-                        Console.WriteLine("Compte tiers inexistant ou compte cuisinier déjà existant, rentrer un nouvel id");
-                        Console.Write("Entrer l'id du compte Tiers : "); id = Convert.ToInt32(Console.ReadLine());
-                        tiersExiste = Existe(conn, "Tiers", "IDTiers", id);
-                        cuisinierExiste = Existe(conn, "Cuisinier", "IDCuisinier", id);
-                    }
-                    AjouterCuisinier(true, id, conn);
+                    if (clientExiste) { Console.WriteLine("Vous êtes déjà cuisinier !"); }
+                    else { AjouterCuisinier(true, idCompteActif, conn); }
 
                 }
 
                 if (choix == "2")
                 {
-                    Console.WriteLine("\nSuppression d'un cuisinier : ");
-                    Console.Write("Entrer l'id du compte Tiers pour supprimer : "); int id = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("\nSuppression de votre compte cuisinier : ");
+                    bool clientExiste = Existe(conn, "Cuisinier", "IDCuisinier", idCompteActif);
 
-                    bool cuisinierExiste = Existe(conn, "Cuisinier", "IDCuisinier", id);
-                    bool tiersExiste = Existe(conn, "Tiers", "IDTiers", id);
-
-                    if (cuisinierExiste == false) { Console.WriteLine("Cusinier inexistant"); }
-                    else if (tiersExiste == false) { Console.WriteLine("Tiers inexistant"); }
-                    else
-                    {
-                        SupprimerCuisinier(conn, "Cuisinier", id);
-                    }
-                    
+                    if (clientExiste) { SupprimerCuisinier(conn, "Cuisinier", idCompteActif); }
+                    else { Console.WriteLine("Vous n'êtes pas cuisinier, veuillez créér un compte cuisinier"); }            
                 }
 
                 if (choix == "3")
                 {
-                    Console.WriteLine("\nConfection d'un plat : ");
-                    Console.Write("Entrer l'id du compte cuisinier: "); string console = Console.ReadLine();
-                    if (console == "r") { RetourMenu(conn); break; return; }
-                    int id = Convert.ToInt32(console);
-
-                    bool cuisinierExiste = Existe(conn, "Cuisinier", "IDCuisinier", id);
-                    while (cuisinierExiste == false)
+                    if (!Existe(conn, "Cuisinier", "IDCuisinier", idCompteActif))
                     {
-                        Console.WriteLine("Compte cuisinier inexistant, rentrer un nouvel id");
-                        Console.Write("Entrer l'id du compte Cuisinier : "); id = Convert.ToInt32(Console.ReadLine());
-                        cuisinierExiste = Existe(conn, "Cuisinier", "IDCuisinier", id);
+                        Console.WriteLine("Erreur : cet utilisateur n'est pas enregistré comme cuisinier.");
                     }
-                    Console.WriteLine("");
-                    ModulePlat(conn, id);
+                    else
+                    {
+                        AjoutPlat(conn, idCompteActif);
+
+                    }
                 }
 
                 if (choix == "4")
                 {
-                    InterfaceModifierCompte(conn, "Cuisinier");
+                    PlatsAffichage(conn, idCompteActif, "PlatDuJour");
                 }
 
                 if (choix == "5")
                 {
-                    Console.Write("Entrer l'id du Cuisinier dont vous voulez afficher les infos : ");
-                    int idCuisinier = Convert.ToInt32(Console.ReadLine());
-                    while (!Existe(conn, "Cuisinier", "IDCuisinier", idCuisinier)) 
+                    InterfaceModifierCompte(conn, "Cuisinier", idCompteActif);
+                }
+
+                if (choix == "6")
+                {
+                    Console.Write("Afficher mes infos ? (1) ou celles d'un autre cuisinier (2) : ");
+                    string choixInfos = Console.ReadLine();
+                    if (choixInfos == "1")
                     {
-                        Console.Write("Entrer un id valide : ");
-                        idCuisinier = Convert.ToInt32(Console.ReadLine());
+                        bool cuisinierExiste = Existe(conn, "Cuisinier", "IDCuisinier", idCompteActif);
+
+                        if (cuisinierExiste) { ChoixAffichageCuisinier(conn, idCompteActif); }
+                        else { Console.WriteLine("Vous n'êtes pas cuisinier, veuillez créer un compte cuisinier"); }
                     }
-                    ChoixAffichageCuisinier(conn, idCuisinier);
+                    else if (choix == "2")
+                    {
+                        Console.Write("Entrer l'id du cuisinier dont vous voulez afficher les infos : ");
+                        int idCuisinier = Convert.ToInt32(Console.ReadLine());
+                        while (!Existe(conn, "Cuisinier", "IDCuisinier", idCompteActif))
+                        {
+                            Console.Write("Entrer un id valide : ");
+                            idCuisinier = Convert.ToInt32(Console.ReadLine());
+                        }
+                        ChoixAffichageCuisinier(conn, idCuisinier);
+                    }
+                    else { Console.WriteLine("Choi invalide"); }
 
                 }
 
                 Console.WriteLine("\nQue voulez-faire ? Selectionner le numéro assoicé à l'option ou entrer 'r' pour retourner en arrière: ");
+                Console.WriteLine("1 - Devenir cuisinier \n2 - Supprimer un cuisinier \n3 - Proposer un nouveau plat \n4 - Afficher mes plats proposés \n5 - Modifier mon compte cuisinier \n6 - Afficher les données d'un cuisinier");
                 Console.Write("Choix : ");
                 choix = Console.ReadLine();
-                while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "5" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+                while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "5" && choix != "6" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
             }
-            RetourMenu(conn);
+            RetourMenu(conn, idCompteActif);
         }
 
         public static void ChoixAffichageCuisinier(MySqlConnection conn, int idCuisinier)
@@ -379,9 +507,9 @@ namespace Association
                 PlatsAffichage(conn, idCuisinier, "PlatDuJour");
             }
         }
-        static void ModulePlat(MySqlConnection conn, int idCuisinier)
+        static void AjoutPlat(MySqlConnection conn, int idCuisinier)
         {
-            Console.WriteLine("Ajout d'un plat");
+            Console.WriteLine("\nAjout d'un plat : ");
             Random random = new Random();
             int idplat = new Random().Next(1, 1001);
             while (Existe(conn, "Plat", "IDPlat", idplat)) { idplat = new Random().Next(1, 1001); }
@@ -389,16 +517,16 @@ namespace Association
             Console.Write("Type du plat : "); string type = Console.ReadLine();
             Console.Write("Date de fabrication du plat (JJ-MM-AAAA) : "); DateTime fabrication = Convert.ToDateTime(Console.ReadLine());
             Console.Write("Date de peremption du plat (JJ-MM-AAAA) : "); DateTime peremption = Convert.ToDateTime(Console.ReadLine());
-            Console.Write("nationalité du plat : "); string natio = Console.ReadLine();
-            Console.Write("ingredients du plat : "); string ingredients = Console.ReadLine();
-            Console.Write("regime du plat : "); string regime = Console.ReadLine();
-            Console.Write("prix du plat (avec une virgule et pas un point) : "); string prixLu = Console.ReadLine(); prixLu.Replace(".", ","); double prix = Convert.ToDouble(prixLu);
+            Console.Write("Nationalité du plat : "); string natio = Console.ReadLine();
+            Console.Write("Ingredients du plat : "); string ingredients = Console.ReadLine();
+            Console.Write("Régime du plat : "); string regime = Console.ReadLine();
+            Console.Write("Prix du plat (avec une virgule et pas un point) : "); string prixLu = Console.ReadLine(); prixLu.Replace(".", ","); double prix = Convert.ToDouble(prixLu);
             Console.Write("Nombre de personnes pour le plat : "); int nbPersonnes = Convert.ToInt32(Console.ReadLine());
 
             FairePlat(true, conn, idplat, type, nomPlat, fabrication, peremption, natio, regime, ingredients, prix, nbPersonnes, idCuisinier);
         }
 
-        static void ModuleCommande(MySqlConnection conn)
+        static void ModuleCommande(MySqlConnection conn, int idCompteActif)
 		{
 			Console.Clear(); Console.WriteLine("Bienvenue sur le module commande\nOptions : \n");
             Console.WriteLine("1 - Faire une commande");
@@ -420,46 +548,60 @@ namespace Association
 			{
                 if (choix == "1")
                 {
-                    Console.WriteLine("Ajout d'une commande : ");
-                    Random random = new Random();
-                    int idCommande = random.Next(1, 1001);
-                    while(Existe(conn, "Commande", "IDCommande", idCommande))
+                    if(!Existe(conn, "Client", "IDClient", idCompteActif))
                     {
-                        idCommande = random.Next(1, 1001);
+                        Console.WriteLine("Erreur : vous n'êtes pas un client. Veuillez créér un compte client dans l'interface 'Client'");
                     }
-                    Console.Write("Entrer une date de commande : "); DateTime date = Convert.ToDateTime(Console.ReadLine());
-                    Console.Write("Entrer une heure de commande : "); DateTime heure = Convert.ToDateTime(Console.ReadLine());
-                    Console.Write("Entrer un id de client : "); int idClient = Convert.ToInt32(Console.ReadLine());
-                    Console.Write("Entrer un id de cuisinier : "); int idCuisinier = Convert.ToInt32(Console.ReadLine());
-                    Console.Write("Entrer un id de plat : "); int idPlat = Convert.ToInt32(Console.ReadLine());
-                    FaireUneCommande(true, conn, idCommande, date, heure, idClient, idCuisinier);
-                    bool valide = PlatCuisinierValide(conn, idCuisinier, idPlat);
-
-                    if (valide == false) { Console.WriteLine("Ce plat n'est pas disponible pour ce cuisinier"); }
                     else
                     {
-                        CommandePlat(conn, idCommande, idPlat);
+                        Console.WriteLine("\nPlats disponibles : "); /// affichage des plats pour faciliter le choix du client
+                        PlatsDispos(conn);
+
+                        Console.WriteLine("Ajout d'une commande : ");
+                        Random random = new Random();
+                        int idCommande = random.Next(1, 1001);
+                        while (Existe(conn, "Commande", "IDCommande", idCommande))
+                        {
+                            idCommande = random.Next(1, 1001);
+                        }
+                        Console.Write("Entrer une date de livraison : "); DateTime date = Convert.ToDateTime(Console.ReadLine());
+                        Console.Write("Entrer une heure de livraison : "); DateTime heure = Convert.ToDateTime(Console.ReadLine());
+                        Console.Write("Entrer un id de cuisinier : "); int idCuisinier = Convert.ToInt32(Console.ReadLine());
+                        Console.Write("Entrer un id de plat : "); int idPlat = Convert.ToInt32(Console.ReadLine());
+                        bool valide = PlatCuisinierValide(conn, idCuisinier, idPlat);
+
+                        if (valide == false) { Console.WriteLine("Ce plat n'est pas disponible pour ce cuisinier, il n'est donc pas ajouté à la commande"); }
+                        else
+                        {
+                            CommandePlat(conn, idCommande, idPlat);
+                        }
+
+                     
+                        Console.Write("Voulez-vous ajouter d'autres plats à la commande (oui 'O' ou non 'N') ? "); string rep = Console.ReadLine().ToUpper();
+                        while (rep == "O")
+                        {
+                            Console.Write("Entrer un id de cuisinier : "); idCuisinier = Convert.ToInt32(Console.ReadLine());
+                            Console.Write("\nEntrer un id de plat : "); idPlat = Convert.ToInt32(Console.ReadLine());
+
+                            valide = PlatCuisinierValide(conn, idCuisinier, idPlat);
+
+                            if (valide == false) { Console.WriteLine("Ce plat n'est pas disponible pour ce cuisinier, il n'est donc pas ajouté à la commande"); }
+                            else
+                            {
+                                CommandePlat(conn, idCommande, idPlat);
+                            }
+
+                            Console.Write("Voulez-vous ajouter d'autres plats à la commande (oui 'O' ou non 'N') ? "); rep = Console.ReadLine().ToUpper();
+                        }
+                        FaireUneCommande(true, conn, idCommande, date, heure, idCompteActif, idCuisinier);
+                        Console.WriteLine("Commande terminée, on peut passer à la transaction : ");
+                        Console.WriteLine("Prix de la commande : " + CalculerPrixCommande(idCommande, conn) + " euros");
+                        Console.WriteLine("\nPour faciliter la livraison, donner les stations de métro (attention à l'orthographe et mettre des espaces entre les tirets) les plus proches du : ");
+                        Console.Write("Client : "); string station1 = Console.ReadLine();
+                        Console.Write("Cuisinier : "); string station2 = Console.ReadLine();
+                        MetroParis(station1, station2);
                     }
-
-                    Console.Write("Voulez-vous ajouter d'autres plats à la commande (oui 'O' ou non 'N') ? "); string rep = Console.ReadLine().ToUpper();
-                    while (rep == "O")
-                    {
-                        Console.Write("\nEntrer un id de plat : "); idPlat = Convert.ToInt32(Console.ReadLine());
-                        bool PlatDejaCommande = Existe(conn, "PlatCommande", "IDPlat", idPlat);
-                        valide = PlatCuisinierValide(conn, idCuisinier, idPlat);
-                        if (PlatDejaCommande) { Console.WriteLine("Ce plat a déjà été commandé, il n'est plus disponible malhereusement :("); }
-                        else if (valide == false) { Console.WriteLine("Ce plat n'est pas disponible pour ce cuisinier"); }
-
-                        else { CommandePlat(conn, idCommande, idPlat); }
-                        Console.Write("Voulez-vous ajouter d'autres plats à la commande (oui 'O' ou non 'N') ? "); rep = Console.ReadLine().ToUpper();
-                    }
-
-                    Console.WriteLine("Commande terminée, on peut passer à la transaction : ");
-                    Console.WriteLine("Prix de la commande : " + CalculerPrixCommande(idCommande, conn) + " euros");
-                    Console.WriteLine("\nPour faciliter la livraison, donner les stations de métro (attention à l'orthographe et mettre des espaces entre les tirets) les plus proches du : ");
-                    Console.Write("Client : "); string station1 = Console.ReadLine();
-                    Console.Write("Cuisinier : "); string station2 = Console.ReadLine();
-                    MetroParis(station1, station2);
+                    
                 }
 
                 if (choix == "2")
@@ -488,12 +630,10 @@ namespace Association
 				}
 
 			}
-			RetourMenu(conn); 
-
-			//RetourMenu();
+			RetourMenu(conn, idCompteActif); 
 		}
 
-		static void ModuleStatistiques(MySqlConnection conn)
+		static void ModuleStatistiques(MySqlConnection conn, int idCompteActif)
 		{
             Console.Clear(); Console.WriteLine("Bienvenue sur le module statistiques\nOptions : \n");
             Console.WriteLine("1 - Nombre de commandes effectuées par cuisinier");
@@ -577,7 +717,7 @@ namespace Association
                 }
 
             }
-            RetourMenu(conn);
+            RetourMenu(conn, idCompteActif);
         }
 
         public static void CommandesTemps(MySqlConnection conn, int? idClient=null)

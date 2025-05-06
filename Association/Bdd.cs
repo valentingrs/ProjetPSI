@@ -3,6 +3,8 @@ using MySqlX.XDevAPI.Relational;
 using SkiaSharp;
 using System.ComponentModel;
 using System.Data.Common;
+using System.Net;
+using System.Reflection.Metadata.Ecma335;
 using System.Transactions;
 
 namespace Association
@@ -71,9 +73,52 @@ namespace Association
         }
 
         #endregion
+        public static bool VerfierConnexion(MySqlConnection conn, string email, string mdp)
+        {
+            bool connecte = false;
+            try
+            {
+                string query = "SELECT MotDePasse FROM Tiers WHERE email = '" + email + "';";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                using (reader)
+                {
+                    if (reader.Read()) /// car au plus un élément (clé primaire) dans le reader donc pas problématique
+                    {
+                        string motdepasse = (string)reader["MotDePasse"];
+                        if (mdp == motdepasse) { connecte = true; }
+                        else { Console.WriteLine("Mot de passe faux"); }
+                    }
+                    else { Console.WriteLine("Pas de compte existant avec cet email."); }
+                }
+            }
+            catch (MySqlException e) { Console.WriteLine($"Erreur MySQL : {e.Message}"); }
+            return connecte;
+       
+        }
+
+        static public int RecupIdMail(MySqlConnection conn, string email)
+        {
+            int id = 0;
+            try
+            {
+                string queryId = "SELECT IDTiers FROM Tiers WHERE Email = '" + email + "';";
+                MySqlCommand cmd = new MySqlCommand(queryId, conn); MySqlDataReader reader = cmd.ExecuteReader();
+                using (reader)
+                {
+                    while (reader.Read())
+                    {
+                        id = (int)reader["IDTiers"];
+                    }
+                }
+            }
+            catch (MySqlException e) { Console.WriteLine($"Erreur MySQL : {e.Message}"); }
+            return id;
+        }
 
         #region Tiers
-        public static void CreerUnCompte(MySqlConnection conn, int IDTiers, string CodeP, string Ville, string Email, string Tel, string Nom, string Adresse, string Prenom)
+        public static void CreerUnCompte(MySqlConnection conn, int IDTiers, string mdp, string CodeP, string Ville, string Email, string Tel, string Nom, string Adresse, string Prenom)
         {
 
             if (Existe(conn, "Tiers", "IDTiers", IDTiers)) { Console.WriteLine("Compte déjà existant !"); return; }
@@ -81,8 +126,8 @@ namespace Association
             {
                 try
                 {
-                    string query = $"INSERT INTO Tiers (IDTiers, CodePostal, Ville, Email, Tel, Nom, Adresse, Prenom) " +
-                                   $"VALUES ({IDTiers}, '{CodeP}', '{Ville}', '{Email}', '{Tel}', '{Nom}', '{Adresse}', '{Prenom}');";
+                    string query = $"INSERT INTO Tiers (IDTiers, MotDePasse, CodePostal, Ville, Email, Tel, Nom, Adresse, Prenom) " +
+                                   $"VALUES ({IDTiers}, '{mdp}', '{CodeP}', '{Ville}', '{Email}', '{Tel}', '{Nom}', '{Adresse}', '{Prenom}');";
 
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
@@ -132,7 +177,6 @@ namespace Association
                 Console.WriteLine($"Erreur MySQL : {e.Message}");
             }
         }
-
         #endregion
 
         #region Cuisinier
@@ -180,14 +224,14 @@ namespace Association
 
         public static void AffichageClientsSql(MySqlConnection conn, string donnees, bool croissant)
         {
-            string query = "SELECT Tiers.IDTiers, Tiers.Prenom, Tiers.Nom, Tiers.Adresse FROM Client " +
+            string query = "SELECT Tiers.Prenom, Tiers.Nom, Tiers.Adresse FROM Client " +
                            "JOIN Tiers ON Client.IDClient = Tiers.IDTiers " + "ORDER BY ";
 
             if (donnees == "Ordre alpha") { query += "Nom ASC, Prenom ASC;"; }
             else if (donnees == "Rue") { query += "Adresse ASC;"; }
             else if (donnees == "Achats")
             {
-                query = "SELECT Tiers.IDTiers, Tiers.Nom, Tiers.Prenom, SUM(Plat.PrixPlat) AS MontantTotalAchats " +
+                query = "SELECT Tiers.Nom, Tiers.Prenom, , Tiers.Adresse, SUM(Plat.PrixPlat) AS MontantTotalAchats " +
                         "FROM  Client " +
                         "JOIN Tiers ON Client.IDClient = Tiers.IDTiers " +
                         "JOIN Commande ON Client.IDClient = Commande.IDClient " +
@@ -270,10 +314,27 @@ namespace Association
                 string prix = PrixPlat.ToString().Replace(",", "."); // formatage du prix pour qu'il convienne à Sql
                 try
                 {
-                    string query = $"INSERT INTO Plat " +
-                                   $"VALUES ({IDPlat}, '{TypePlat}', '{nomPlat}', '{Formatfabrication}', '{Formatperemption}', '{Nationalite}', '{Regime}', '{Ingredients}', {prix}, {NombrePersonnes}, {idCuisinier});";
+                    if (!Existe(conn, "Plat", "IDPlat", IDPlat))
+                    {
+                        string query = $"INSERT INTO Plat VALUES ({IDPlat}, '{nomPlat}', '{TypePlat}', '{Ingredients}', '{Nationalite}', '{Regime}');";
+                        using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                            Console.WriteLine("Plat ajouté avec succès !");
+                        }
+                    }
 
-                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    
+                    Random random = new Random();
+                    int idPlatCuisinier = random.Next(1, 1001);
+                    while (Existe(conn, "PlatCuisinier", "IDPlatCuisinier", idPlatCuisinier))
+                    {
+                        idPlatCuisinier = random.Next(1, 1001);
+                    }
+                    string query2 = $"INSERT INTO PlatCuisinier " +
+                                   $"VALUES ({idPlatCuisinier}, {IDPlat}, '{Formatfabrication}', '{Formatperemption}', '{Ingredients}', '{prix}', '{NombrePersonnes}', '{idCuisinier}');";
+
+                    using (MySqlCommand cmd = new MySqlCommand(query2, conn))
                     {
                         cmd.ExecuteNonQuery();
                         Console.WriteLine("Plat ajouté avec succès !");
@@ -335,16 +396,18 @@ namespace Association
                 string query = "";
                 if (param == "PlatsFreq")
                 {
-                    query = "SELECT Plat.NomPlat AS Plat, COUNT(pc.IDPlat) AS Nombre FROM Plat " +
-                               "JOIN PlatCommande pc ON pc.IDPlat = Plat.IDPlat " +
-                               $"WHERE Plat.IDCuisinier = {id} " +
-                               "GROUP BY Plat.NomPlat";
+                    query = "SELECT Plat.NomPlat AS Plat, COUNT(PlatCommande.IDCommande) AS NombreCommandes FROM PlatCuisinier " +
+                               "JOIN Plat ON PlatCuisinier.IDPlat = Plat.IDPlat " +
+                               "LEFT JOIN PlatCommande ON PlatCommande.IDPlatCuisinier = PlatCuisinier.IDPlatCuisinier " +
+                               $"WHERE PlatCuisinier.IDCuisinier = {id} " +
+                               "GROUP BY Plat.NomPlat;";
                 }
                 if (param == "PlatDuJour")
                 {
-                    query = "SELECT Plat.IDPlat AS n°, Plat.NomPlat AS Nom FROM Plat " +
-                           $"WHERE Plat.IDCuisinier = {id} " +
-                            "AND Plat.IDPlat NOT IN(SELECT PlatCommande.IDPlat FROM PlatCommande);";
+                    query = "SELECT Plat.IDPlat AS n°, Plat.NomPlat AS Nom FROM PlatCuisinier pc " +
+                            "JOIN Plat ON pc.IDPlat = Plat.IDPlat " +
+                            $"WHERE pc.IDCuisinier = {id} AND pc.IDPlatCuisinier NOT IN " +
+                            "(SELECT IDPlatCuisinier FROM PlatCommande);";
                 }
                 if (param == "InfosPlat")
                 {
@@ -386,25 +449,15 @@ namespace Association
 
         #region Commande
 
-        public static bool PlatCuisinierValide(MySqlConnection conn, int idCuisinier, int idPlat)
+        public static bool PlatCuisinierValide(MySqlConnection conn, int idCuisinier, int idPlatCuisinier)
         {
             try
             {
-                string query = $"SELECT IDPlat FROM Plat WHERE IDCuisinier = {idCuisinier};";
+                string query = $"SELECT COUNT(*) FROM PlatCuisinier WHERE IDCuisinier = {idCuisinier} AND IDPlatCuisinier = {idPlatCuisinier};";
                 MySqlCommand cmd = new MySqlCommand(query, conn);
-                MySqlDataReader reader = cmd.ExecuteReader();
-                List<int> idPlatsCuisinier = new List<int>();
-
-                using (reader)
-                {
-                    while (reader.Read())
-                    {
-                        int platId = Convert.ToInt32(reader["IDPlat"]);
-                        idPlatsCuisinier.Add(platId);
-                    }
-                }
-                reader.Close();
-                return idPlatsCuisinier.Contains(idPlat);
+                
+                int count = Convert.ToInt32(cmd.ExecuteScalar()); /// en théorie 1
+                return count > 0;
 
             }
             catch (MySqlException e)
@@ -444,10 +497,12 @@ namespace Association
         {
             try
             {
-                string query = "SELECT Plat.NomPlat AS Plat, Plat.Ingredients AS Ingredients, Plat.IDPlat AS IDPlat, Tiers.Prenom, Tiers.Nom, " +
-                    "Tiers.IDTiers AS Identifiant, Tiers.CodePostal AS Arondissement FROM Plat " +
-                    "JOIN Tiers ON Plat.IDCuisinier = Tiers.IDTiers " +
-                    "WHERE Plat.IDPlat NOT IN (SELECT PlatCommande.IDPlat FROM PlatCommande);";
+                string query = "SELECT p.NomPlat AS Plat, p.Ingredients, pc.IDPlatCuisinier AS IDPlat, t.Prenom, t.Nom, t.IDTiers AS Identifiant, t.CodePostal AS Arrondissement " +
+                               "FROM PlatCuisinier pc " +
+                               "JOIN Plat p ON pc.IDPlat = p.IDPlat " +
+                               "JOIN Cuisinier c ON pc.IDCUisinier = c.IDCuisinier " +
+                               "JOIN Tiers t ON c.IDCuisinier = t.IDTiers " +
+                               "WHERE pc.IDPlatCuisinier NOT IN (SELECT IDPlatCuisinier FROM PlatCommande);";
 
                 MySqlCommand cmd = new MySqlCommand(query, conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
@@ -466,7 +521,7 @@ namespace Association
                             reader["Prenom"],
                             reader["Nom"],
                             reader["Identifiant"],
-                            reader["Arondissement"]);
+                            reader["Arrondissement"]);
                     }
                 }
             }
