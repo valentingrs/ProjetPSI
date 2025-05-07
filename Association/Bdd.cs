@@ -449,6 +449,32 @@ namespace Association
 
         #region Commande
 
+        public static bool CuisinierValide(MySqlConnection conn, int idCuisinier)
+        {
+            try
+            {
+                string query = "SELECT DISTINCT pc.IDCuisinier\r\nFROM PlatCuisinier pc\r\nLEFT JOIN PlatCommande pcom ON pc.IDPlatCuisinier = pcom.IDPlatCuisinier\r\nWHERE pcom.IDPlatCuisinier IS NULL;";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int id = reader.GetInt32("IDCuisinier");
+                        Console.WriteLine(id);
+                        if (id == idCuisinier)
+                            return true;
+                    }
+                    return false;
+                }
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine($"Erreur MySQL : {e.Message}");
+                return false;
+            }
+        }
+
         public static bool PlatCuisinierValide(MySqlConnection conn, int idCuisinier, int idPlatCuisinier)
         {
             try
@@ -531,12 +557,12 @@ namespace Association
             }
         }
 
-        public static void CommandePlat(MySqlConnection conn, int idCommande, int idPlat)
+        public static void CommandePlat(MySqlConnection conn, int idCommande, int idPlatCuisinier)
         {
             try
             {
-                string query = $"INSERT INTO PlatCommande (IDCommande, IDPlat) " +
-                               $"VALUES ({idCommande}, {idPlat});";
+                string query = $"INSERT INTO PlatCommande (IDCommande, IDPlatCuisinier) " +
+                               $"VALUES ({idCommande}, {idPlatCuisinier});";
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
                     cmd.ExecuteNonQuery();
@@ -553,7 +579,7 @@ namespace Association
         {
             double prixC = 0;
 
-            string query = $"SELECT SUM(p.PrixPlat) AS PrixTotal FROM PlatCommande c JOIN Plat p ON c.IDPlat = p.IDPlat WHERE c.IDCommande = {idCommande};";
+            string query = $"SELECT SUM(pc.PrixPlat) AS PrixTotal FROM PlatCommande c JOIN PlatCuisinier pc ON c.IDPlatCuisinier = pc.IDPlatCuisinier WHERE c.IDCommande = {idCommande};";
 
             using (var commande = new MySqlCommand(query, conn))
             {
@@ -646,10 +672,10 @@ namespace Association
             try
             {
                 string query = "SELECT Tiers.Prenom, Tiers.Nom, Count(Commande.IDCommande) " +
-                            "AS NombreCommandes FROM Commande " +
+                            "AS NombreDeCommandes FROM Commande " +
                             "JOIN Tiers ON Commande.IDCuisinier = Tiers.IDTiers " +
-                            "GROUP BY Tiers.IDTiers " +
-                            "ORDER BY NombreCommandes DESC";
+                            "GROUP BY Tiers.IDTiers, Tiers.Prenom, Tiers.Nom " +
+                            "ORDER BY NombreDeCommandes DESC;";
 
                 MySqlCommand cmd = new MySqlCommand(query, conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
@@ -673,7 +699,7 @@ namespace Association
 
         public static void AfficherCommandes(MySqlConnection conn, DateTime debut, DateTime fin, string duree, int? idClient=null) // paramètre idClient facultatif
         {
-            string query = "SELECT c.IDCommande, c.DateCommande, c.IDClient, c.IDCuisinier FROM Commande c ";
+            string query = "SELECT c.IDCommande, c.DateCommande, c.HeureCommande, c.IDClient, c.IDCuisinier FROM Commande c ";
 
 
             if (duree == "Toujours") { query += ""; }
@@ -696,7 +722,7 @@ namespace Association
 
             if (idClient.HasValue) // paramètre supplémentaire si on veut la requête pour qu'un client précis
             {
-                if (duree == "Toujours") { Console.Write("check tojours");  query += $" WHERE c.IDClient = {idClient};"; }
+                if (duree == "Toujours") { query += $" WHERE c.IDClient = {idClient};"; }
                 else
                 {
                     query += $" AND c.IDClient = {idClient};";
@@ -712,7 +738,22 @@ namespace Association
                 {
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        Console.Write($"{reader.GetName(i)}: {reader[i]}\t");
+                        object value = reader[i];
+
+                        if (value is DateTime dt)
+                        {
+                            /// Affiche uniquement la date (sans l'heure) si c’est DateCommande
+                            if (reader.GetName(i) == "DateCommande")
+                                Console.Write($"{reader.GetName(i)}: {dt.ToString("dd/MM/yyyy")}\t");
+                            else if (reader.GetName(i) == "HeureCommande")
+                                Console.Write($"{reader.GetName(i)}: {dt.ToString("HH:mm")}\t");
+                            else
+                                Console.Write($"{reader.GetName(i)}: {dt}\t");
+                        }
+                        else
+                        {
+                            Console.Write($"{reader.GetName(i)}: {value}\t");
+                        }
                     }
                     Console.WriteLine();
                 }
@@ -740,18 +781,19 @@ namespace Association
             string query = "";
             if (param == "PrixCommandes")
             {
-                query = "SELECT AVG(PrixTotal) AS Prix FROM (SELECT c.IDCommande, SUM(p.PrixPlat) AS PrixTotal FROM PlatCommande c " + 
-                        "JOIN Plat p ON c.IDPlat = p.IDPlat GROUP BY c.IDCommande) AS Moyenne;";
+                query = "SELECT AVG(PrixTotal) AS Prix FROM (SELECT pc.IDCommande, SUM(pcui.PrixPlat) AS PrixTotal " +
+                        "FROM PlatCommande pc " +
+                        "JOIN PlatCuisinier pcui ON pc.IDPlatCuisinier = pcui.IDPlatCuisinier " +
+                        "GROUP BY pc.IDCommande) AS Moyenne;";
             }
             if (param == "MoyenneClients")
             {
                 query = "SELECT AVG(MontantTotalAchats) AS Moyenne FROM " +
-                        "(SELECT SUM(Plat.PrixPlat) AS MontantTotalAchats, Client.IDClient FROM  Client " +
-                        "JOIN Tiers ON Client.IDClient = Tiers.IDTiers " +
-                        "JOIN Commande ON Client.IDClient = Commande.IDClient " +
-                        "JOIN PlatCommande ON Commande.IDCommande = PlatCommande.IDCommande " +
-                        "JOIN Plat ON PlatCommande.IDPlat = Plat.IDPlat " +
-                        "GROUP BY Client.IDClient) AS MoyenneComptesClient; ";
+                        "(SELECT SUM(pcui.PrixPlat) AS MontantTotalAchats, c.IDClient FROM Client c " +
+                        "JOIN Commande com ON c.IDClient = com.IDClient " +
+                        "JOIN PlatCommande pc ON com.IDCommande = pc.IDCommande " +
+                        "JOIN PlatCuisinier pcui ON pc.IDPlatCuisinier = pcui.IDPlatCuisinier " +
+                        "GROUP BY c.IDClient) AS MoyennneComptesClient;";
             }
             MySqlCommand cmd = new MySqlCommand(query, conn);
             MySqlDataReader reader = cmd.ExecuteReader();
@@ -763,8 +805,7 @@ namespace Association
                     {
                         Console.Write($"{reader.GetName(i)}: {reader[i]}\t");
                     }
-                    Console.Write(" euros");
-                    Console.WriteLine();
+                    Console.WriteLine(" euros");
                 }
             }
             reader.Close();

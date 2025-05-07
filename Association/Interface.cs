@@ -567,21 +567,29 @@ namespace Association
                         Console.Write("Entrer une date de livraison : "); DateTime date = Convert.ToDateTime(Console.ReadLine());
                         Console.Write("Entrer une heure de livraison : "); DateTime heure = Convert.ToDateTime(Console.ReadLine());
                         Console.Write("Entrer un id de cuisinier : "); int idCuisinier = Convert.ToInt32(Console.ReadLine());
+                        bool cuisinierValde = CuisinierValide(conn, idCuisinier); 
+                        while (cuisinierValde == false)
+                        {
+                            Console.Write("Entrer un id de cuisinier existant: "); idCuisinier = Convert.ToInt32(Console.ReadLine());
+                            cuisinierValde = CuisinierValide(conn, idCuisinier);
+                        }
                         Console.Write("Entrer un id de plat : "); int idPlat = Convert.ToInt32(Console.ReadLine());
                         bool valide = PlatCuisinierValide(conn, idCuisinier, idPlat);
+                        FaireUneCommande(true, conn, idCommande, date, heure, idCompteActif, idCuisinier);
 
                         if (valide == false) { Console.WriteLine("Ce plat n'est pas disponible pour ce cuisinier, il n'est donc pas ajouté à la commande"); }
                         else
                         {
                             CommandePlat(conn, idCommande, idPlat);
+
                         }
 
                      
                         Console.Write("Voulez-vous ajouter d'autres plats à la commande (oui 'O' ou non 'N') ? "); string rep = Console.ReadLine().ToUpper();
+                        Console.WriteLine("\n");
                         while (rep == "O")
                         {
-                            Console.Write("Entrer un id de cuisinier : "); idCuisinier = Convert.ToInt32(Console.ReadLine());
-                            Console.Write("\nEntrer un id de plat : "); idPlat = Convert.ToInt32(Console.ReadLine());
+                            Console.Write("Entrer un id de plat : "); idPlat = Convert.ToInt32(Console.ReadLine());
 
                             valide = PlatCuisinierValide(conn, idCuisinier, idPlat);
 
@@ -591,9 +599,9 @@ namespace Association
                                 CommandePlat(conn, idCommande, idPlat);
                             }
 
-                            Console.Write("Voulez-vous ajouter d'autres plats à la commande (oui 'O' ou non 'N') ? "); rep = Console.ReadLine().ToUpper();
+                            Console.Write("Voulez-vous ajouter d'autres plats à la commande (oui 'O' ou non 'N') ? \n"); rep = Console.ReadLine().ToUpper();
                         }
-                        FaireUneCommande(true, conn, idCommande, date, heure, idCompteActif, idCuisinier);
+
                         Console.WriteLine("Commande terminée, on peut passer à la transaction : ");
                         Console.WriteLine("Prix de la commande : " + CalculerPrixCommande(idCommande, conn) + " euros");
                         Console.WriteLine("\nPour faciliter la livraison, donner les stations de métro (attention à l'orthographe et mettre des espaces entre les tirets) les plus proches du : ");
@@ -668,45 +676,70 @@ namespace Association
 
                 if (choix == "3")
                 {
-                    Console.WriteLine("Moyenne des prix des commandes : ");
+                    if (idCompteActif != 1)
+                    {
+                        Console.WriteLine("Vous ne pouvez pas avoir accès à ces données si vous n'êtes pas administrateur");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Moyenne des prix des commandes : ");
 
-                    MoyenneStats(conn, "PrixCommandes");
+                        MoyenneStats(conn, "PrixCommandes");
+                    }    
                 }
                 if (choix == "4")
                 {
-                    Console.WriteLine("Moyenne de comptes clients");
-                    MoyenneStats(conn, "MoyenneClients");
+                    if (idCompteActif != 1)
+                    {
+                        Console.WriteLine("Vous ne pouvez pas avoir accès à ces données si vous n'êtes pas administrateur");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Moyenne de comptes clients");
+                        MoyenneStats(conn, "MoyenneClients");
+                    }       
                 }
 
                 if (choix == "5")
                 {
-                    Console.Write("Entrer l'identifiant du client : "); int idclient = Convert.ToInt32(Console.ReadLine());
-                    while (!Existe(conn, "Client", "IDClient", idclient))
+                    if (idCompteActif != 1) { Console.WriteLine("Vous ne pouvez pas avoir accès à ces données si vous n'êtes pas administrateur"); }
+                    else
                     {
-                        Console.WriteLine("Entrer un identifiant valide de client : "); idclient = Convert.ToInt32(Console.ReadLine());
+                        Console.Write("Entrer l'identifiant du client : "); int idclient = Convert.ToInt32(Console.ReadLine());
+                        while (!Existe(conn, "Client", "IDClient", idclient))
+                        {
+                            Console.WriteLine("Entrer un identifiant valide de client : "); idclient = Convert.ToInt32(Console.ReadLine());
+                        }
+                        Console.WriteLine("\nAfficher la liste des commandes pour un client selon : ");
+                        Console.WriteLine("1 - Nationalité");
+                        Console.WriteLine("2 - Période");
+                        Console.Write("Choix (entrer le numéro) : "); string choixListe = Console.ReadLine().Trim();
+                        while (choixListe != "1" && choixListe != "2")
+                        {
+                            Console.Write("Rentrer un choix valide : ");
+                            choixListe = Console.ReadLine();
+                        }
+                        if (choixListe == "1")
+                        {
+                            Console.Write("\nEntrer une nationalité : ");
+                            string nationalite = Console.ReadLine();
+                            NatioPlats(conn, nationalite, idclient);
+                        }
+                        if (choixListe == "2")
+                        {
+                            Console.WriteLine();
+                            CommandesTemps(conn, idclient);
+                        }
                     }
-                    Console.WriteLine("Afficher la liste des commandes pour un client selon : ");
-                    Console.WriteLine("1 - Nationalité");
-                    Console.WriteLine("2 - Période");
-                    Console.Write("Choix (entrer le numéro) : "); string choixListe = Console.ReadLine().Trim();
-                    while (choixListe != "1" && choixListe != "2")
-                    {
-                        Console.Write("Rentrer un choix valide : ");
-                        choixListe = Console.ReadLine();
-                    }
-                    if (choixListe == "1")
-                    {
-                        Console.Write("Entrer une nationalité : ");
-                        string nationalite = Console.ReadLine();
-                        NatioPlats(conn, nationalite, idclient);
-                    }
-                    if (choixListe == "2")
-                    {
-                        CommandesTemps(conn, idclient);
-
-                    }
+                    
                 }
 
+                Console.WriteLine("\n1 - Nombre de commandes effectuées par cuisinier");
+                Console.WriteLine("2 - Commandes selon une période de temps");
+                Console.WriteLine("3 - Moyenne des prix des commandes");
+                Console.WriteLine("4 - Moyenne des comptes clients");
+                Console.WriteLine("5 - Liste des commandes pour un client selon la nationalité des plats, la période ");
+                Console.WriteLine("Pour retourner au menu principal, entrer 'r'");
                 Console.Write("\nChoix : ");
                 choix = Console.ReadLine();
 

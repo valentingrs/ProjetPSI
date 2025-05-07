@@ -67,7 +67,7 @@ CREATE TABLE PlatCommande(
     IDPlatCuisinier INT,
     PRIMARY KEY (IDCommande, IDPlatCuisinier), /* un plat ne peut être affecté qu'à au plus une commande */
     FOREIGN KEY (IDCommande) REFERENCES Commande(IDCommande) ON DELETE CASCADE, 
-    FOREIGN KEY (IDPlatCuisinier) REFERENCES Plat(IDPlat) ON DELETE CASCADE
+    FOREIGN KEY (IDPlatCuisinier) REFERENCES PlatCuisinier(IDPlatCuisinier) ON DELETE CASCADE
 );
 
 CREATE TABLE Entreprise(

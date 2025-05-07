@@ -52,21 +52,6 @@ INSERT INTO Commande VALUES
 (6, '2025-04-05', '19:30:00', 6, 13),
 (7, '2025-04-06', '18:45:00', 3, 6);
 
--- Association Commande <-> Plat
-INSERT INTO PlatCommande VALUES
-(1, 1), -- client 1 commande Salade César
-(1, 9), -- client 1 commande Crème brûlée
-(2, 2), -- client 2 commande Boeuf Bourguignon
-(3, 6), -- client 1 commande Soupe Miso
-(3, 7), -- client 1 commande Mochi
-(4, 3), -- client 4 commande Lasagnes
-(5, 11), -- client 5 commande Bruschetta
-(5, 3),  -- client 5 commande Lasagnes
-(6, 13), -- client 6 commande Baklava
-(6, 8),  -- client 6 commande Paella
-(7, 14), -- client 3 commande Pad Thaï
-(7, 2);  -- client 3 commande Boeuf Bourguignon
-
 INSERT INTO PlatCuisinier VALUES
 (1, 1, '2025-04-01', '2025-04-05', NULL, 8.50, 1, 3),
 (2, 2, '2025-04-01', '2025-04-06', NULL, 15.00, 2, 6),
@@ -82,4 +67,21 @@ INSERT INTO PlatCuisinier VALUES
 (12, 12, '2025-04-03', '2025-04-07', NULL, 13.50, 2, 12),
 (13, 13, '2025-04-03', '2025-04-08', NULL, 6.50, 1, 13),
 (14, 14, '2025-04-03', '2025-04-07', NULL, 11.00, 2, 6);
+
+-- Association Commande <-> Plat
+INSERT INTO PlatCommande VALUES
+(1, 1),  -- client 1 commande Salade César (PlatCuisinier ID 1)
+(1, 9),  -- client 1 commande Crème brûlée (PlatCuisinier ID 9)
+(2, 2),  -- client 2 commande Boeuf Bourguignon (PlatCuisinier ID 2)
+(3, 6),  -- client 1 commande Soupe Miso (PlatCuisinier ID 6)
+(3, 7),  -- client 1 commande Mochi (PlatCuisinier ID 7)
+(4, 3),  -- client 4 commande Lasagnes (PlatCuisinier ID 3)
+(5, 11), -- client 5 commande Bruschetta (PlatCuisinier ID 11)
+(5, 3),  -- client 5 commande Lasagnes (PlatCuisinier ID 3)
+(6, 13), -- client 6 commande Baklava (PlatCuisinier ID 13)
+(6, 8),  -- client 6 commande Paella (PlatCuisinier ID 8)
+(7, 14), -- client 3 commande Pad Thaï (PlatCuisinier ID 14)
+(7, 2);  -- client 3 commande Boeuf Bourguignon (PlatCuisinier ID 2)
+
+
 
