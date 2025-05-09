@@ -1,5 +1,7 @@
 using static Association.GrapheStation;
 using static Association.Bdd;
+using static Association.GrapheTiers;
+using static Association.XmlJson;
 using MySql.Data.MySqlClient;
 using System.Text;
 using System.Security.Cryptography.X509Certificates;
@@ -162,7 +164,6 @@ namespace Association
             CreerUnCompte(conn, idTiers, mdp, cp, ville, email, tel, nom, adresse, prenom);
         }
 
-
 		static void ModuleTiers(MySqlConnection conn, int idCompteActif)
 		{
             Console.Clear(); Console.WriteLine("Paramètres du compte\n");
@@ -226,9 +227,11 @@ namespace Association
                 Console.WriteLine("2 - Supprimer un compte");
                 Console.WriteLine("3 - Ajouter un compte client");
                 Console.WriteLine("4 - Suppression d'un compte client");
+                Console.WriteLine("5 - Coloration et étude du graphe Client/Cuisnier");
+                Console.WriteLine("6 - Exporter les données au format XML et JSON");
                 Console.Write("\nChoix : ");
                 string choix = Console.ReadLine();
-                while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
+                while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "5" && choix != "6" && choix != "r") { Console.Write("\nRentre un choix valide : "); choix = Console.ReadLine(); }
                 while (choix != "r")
                 {
                     if (choix == "1")
@@ -272,7 +275,6 @@ namespace Association
                         if (clientExiste == false || tiersExiste == false)
                         {
                             Console.WriteLine("Compte tiers inexistant ou compte client inexistant");
-
                         }
                         else
                         {
@@ -280,9 +282,23 @@ namespace Association
 
                         }
                     }
+
+                    else if (choix == "5")
+                    {
+                        Console.WriteLine("Coloration du graphe : ");
+                        AfficherGrapheClientCuisinier(conn);
+                    }
+
+                    else if (choix == "6")
+                    {
+                        Console.WriteLine("Exportation d'une table au format XML et JSON : ");
+                        MainXmlJson(conn);
+
+                    }
                     Console.Write("\nChoix : ");
                     choix = Console.ReadLine();
-                    while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "r") { Console.Write("\nRentrer un choix valide : "); choix = Console.ReadLine(); }
+                    while (choix != "1" && choix != "2" && choix != "3" && choix != "4" && choix != "5" && choix != "6" && choix != "r") 
+                    { Console.Write("\nRentrer un choix valide : "); choix = Console.ReadLine(); }
                 }
                 RetourMenu(conn, idCompteActif);
             }
@@ -371,7 +387,6 @@ namespace Association
                     break;
             }
         }
-
 
         static void ModuleCuisinier(MySqlConnection conn, int idCompteActif)
 		{
@@ -605,6 +620,10 @@ namespace Association
                         Console.WriteLine("Commande terminée, on peut passer à la transaction : ");
                         Console.WriteLine("Prix de la commande : " + CalculerPrixCommande(idCommande, conn) + " euros");
                         Console.WriteLine("\nPour faciliter la livraison, donner les stations de métro (attention à l'orthographe et mettre des espaces entre les tirets) les plus proches du : ");
+                        Console.WriteLine("Pour avoir les bon noms, vous pouvez vous aider du plan du métro parisien : ");
+
+                        AfficherGrapheStationMetroParis();
+
                         Console.Write("Client : "); string station1 = Console.ReadLine();
                         Console.Write("Cuisinier : "); string station2 = Console.ReadLine();
                         MetroParis(station1, station2);

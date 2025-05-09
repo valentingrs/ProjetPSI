@@ -38,9 +38,6 @@ namespace Association
 		{
 			Dictionary<Noeud<int>, int> coloration = grapheCC.Coloration();
 
-			foreach (int couleur in coloration.Values) { Console.Write(couleur + " ; "); }
-			Console.WriteLine("\nNb chromatique : " + grapheCC.NbChromatique());
-
 			GrapheColorationSommets(grapheCC, coloration, "grapheCCColorié.png");
 		}
 
@@ -52,7 +49,6 @@ namespace Association
             //DessinerGraphe(grapheClientsCuisiniers, "grapheClient.png");
 
             ColorationGraphe(grapheClientsCuisiniers);
-			Console.WriteLine("Etude du graphe des clients et des cuisiniers : \n");
 			Console.WriteLine("Nombre chromatique : " + grapheClientsCuisiniers.NbChromatique());
 			Console.WriteLine("Planaire ? " + grapheClientsCuisiniers.EstPlanaire());
 			Console.WriteLine("Biparti ? " + grapheClientsCuisiniers.EstBiparti());
