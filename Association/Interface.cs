@@ -286,6 +286,7 @@ namespace Association
                     else if (choix == "5")
                     {
                         Console.WriteLine("Coloration du graphe : ");
+                        AfficherGrapheClientCuisinier(conn);
                     }
 
                     else if (choix == "6")
@@ -619,6 +620,10 @@ namespace Association
                         Console.WriteLine("Commande terminée, on peut passer à la transaction : ");
                         Console.WriteLine("Prix de la commande : " + CalculerPrixCommande(idCommande, conn) + " euros");
                         Console.WriteLine("\nPour faciliter la livraison, donner les stations de métro (attention à l'orthographe et mettre des espaces entre les tirets) les plus proches du : ");
+                        Console.WriteLine("Pour avoir les bon noms, vous pouvez vous aider du plan du métro parisien : ");
+
+                        AfficherGrapheStationMetroParis();
+
                         Console.Write("Client : "); string station1 = Console.ReadLine();
                         Console.Write("Cuisinier : "); string station2 = Console.ReadLine();
                         MetroParis(station1, station2);

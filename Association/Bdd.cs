@@ -309,9 +309,9 @@ namespace Association
 
             if (EtreCuisinier)
             {
-                string Formatfabrication = DateFabrication.ToString("yyyy-MM-dd"); // formatage du typeDateTime pour qu'il convienne au type DATE de Sql
+                string Formatfabrication = DateFabrication.ToString("yyyy-MM-dd"); /// formatage du typeDateTime pour qu'il convienne au type DATE de Sql
                 string Formatperemption = DatePeremption.ToString("yyyy-MM-dd");
-                string prix = PrixPlat.ToString().Replace(",", "."); // formatage du prix pour qu'il convienne à Sql
+                string prix = PrixPlat.ToString().Replace(",", "."); /// formatage du prix pour qu'il convienne à Sql
                 try
                 {
                     if (!Existe(conn, "Plat", "IDPlat", IDPlat))

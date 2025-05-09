@@ -80,12 +80,12 @@ namespace Association
             return false;
         }
 
-        public void AfficherNoeuds() // affiche l'ensemble des noeuds du graphe
+        public void AfficherNoeuds() /// affiche l'ensemble des noeuds du graphe
 		{
 			foreach (Noeud<T> noeud in noeuds) { Console.WriteLine(noeud); }
 		}
 
-        public void AfficherLiens() // affiche l'ensemble des liens du graphe
+        public void AfficherLiens() /// affiche l'ensemble des liens du graphe
         {
             foreach (Lien<T> lien in liens) { Console.WriteLine(lien); }
         }
@@ -99,7 +99,7 @@ namespace Association
         #region Methodes utiles
         /// Méthodes plus approfondies et/ou utiles pour d'autres méthodes
         public Noeud<T> IdentifierNoeud(T nom)
-		// identifie un noeud à partir d'un élément de type rentré (une station par exemple)
+		/// identifie un noeud à partir d'un élément de type rentré (une station par exemple)
         {
             Noeud<T> noeudTrouve;
             foreach (Noeud<T> noeud in this.Noeuds)
@@ -112,7 +112,7 @@ namespace Association
         }
 
         public Lien<T> IdentifierLien(Noeud<T> noeud1, Noeud<T> noeud2)
-		// trouver un lien dans le graphe entre deux sommets données
+		/// trouver un lien dans le graphe entre deux sommets données
 		{
 			List<Lien<T>> liensNoeud1 = LiensParNoeud(noeud1);
 			foreach (Lien<T> lien in liensNoeud1)
@@ -123,7 +123,7 @@ namespace Association
 		}
 
 		public List<Lien<T>> LiensParNoeud(Noeud<T> noeud)
-		// retourne les liens partant de ce noeud
+		/// retourne les liens partant de ce noeud
 		{
 			List<Lien<T>> liensNoeud = new List<Lien<T>> ();
 			foreach (Lien<T> lien in liens)
@@ -178,20 +178,20 @@ namespace Association
 
 		public void AfficherListeAdjacence()
 		{
-			Dictionary<Noeud<T>, List<Noeud<T>>> listeAdj = ListeAdjacence();  // Récupérer la liste d'adjacence
+			Dictionary<Noeud<T>, List<Noeud<T>>> listeAdj = ListeAdjacence();  /// Récupérer la liste d'adjacence
 			foreach (var entry in listeAdj)
 			{
-				// Afficher le sommet et ses voisins
+				/// Afficher le sommet et ses voisins
 
 				Console.WriteLine($"{entry.Key.Nom} -> {string.Join(", ", entry.Value.Select(s => s.Nom))}");
 			}
 		}
         public double?[,] MatriceAdjacence()
         {
-            // Stocke le nombre de noeud de G dans V
+            /// Stocke le nombre de noeud de G dans V
             int V = noeuds.Count;
 
-            double?[,] matrice_adjacence = new double?[V, V]; // initialise une matrice de double?
+            double?[,] matrice_adjacence = new double?[V, V]; /// initialise une matrice de double?
 
             int i = 0;
 			bool estPondere = Pondere();
@@ -217,9 +217,9 @@ namespace Association
         /// Exploitation du graphe : parcours, distances, connexité, ...
         public void ParcoursEnLargeur(Noeud<T> depart)
 		{
-			Queue<Noeud<T>> file = new Queue<Noeud<T>>(); // file de sommets FIFO
+			Queue<Noeud<T>> file = new Queue<Noeud<T>>(); /// file de sommets FIFO
 
-			Dictionary<Noeud<T>, bool> visite = new Dictionary<Noeud<T>, bool>(); // dictionnaire des marquages
+			Dictionary<Noeud<T>, bool> visite = new Dictionary<Noeud<T>, bool>(); /// dictionnaire des marquages
 
 			foreach (Noeud<T> sommet in noeuds)
 			{
@@ -229,7 +229,7 @@ namespace Association
 			visite[depart] = true;
 			file.Enqueue(depart);
 
-			// Parcours en largeur
+			/// Parcours en largeur
 			while (file.Count > 0)
 			{
                 Noeud<T> sommetCourant = file.Dequeue();
@@ -248,26 +248,25 @@ namespace Association
 
 		public void ParcoursEnProfondeur(Noeud<T> depart)
 		{
-			// Utilisation d'un dictionnaire pour garder une trace des sommets visités
+			/// Utilisation d'un dictionnaire pour garder une trace des sommets visités
 			Dictionary<Noeud<T>, bool> visite = new Dictionary<Noeud<T>, bool>();
 
-			// Initialisation
+			/// Initialisation
 			foreach (Noeud<T> sommet in noeuds)
 			{
 				visite[sommet] = false;
 			}
 
-			// Appel récursif pour le parcours en profondeur
+			/// Appel récursif pour le parcours en profondeur
 			ParcoursEnProfondeurRecursif(depart, visite);
 		}
 
 		private void ParcoursEnProfondeurRecursif(Noeud<T> sommetCourant, Dictionary<Noeud<T>, bool> visite)
 		{
-			// Marquer le sommet courant comme visité
+			/// Marquer le sommet courant comme visité
 			visite[sommetCourant] = true;
-			Console.Write(sommetCourant.Nom + " ");
 
-			// Parcourir tous les voisins du sommet courant
+			/// Parcourir tous les voisins du sommet courant
 			foreach (Noeud<T> voisin in sommetCourant.Voisins)
 			{
 				if (visite.ContainsKey(voisin) && !visite[voisin])
@@ -277,7 +276,7 @@ namespace Association
 			}
 		}
 
-		public bool EstConnexe() // utilsiation du dfs
+		public bool EstConnexe() /// utilsiation du dfs
 		{
 			if (noeuds.Count == 0) return true;
 
@@ -303,8 +302,8 @@ namespace Association
 
 		public bool EstPlanaire()
 		{
-			return NbChromatique() <= 4; // plutôt regarder en fcontion des cas
-			// et au pire on teste la coloration pour 4 couleurs
+			return NbChromatique() <= 4; /// plutôt regarder en fcontion des cas
+			/// et au pire on teste la coloration pour 4 couleurs
 		}
 
         public Dictionary<Noeud<T>, int> Coloration()
@@ -317,7 +316,6 @@ namespace Association
 			{
 				/// coloriable si et seulement si le graphe est non-orienté
 				List<Noeud<T>> listeSommetsDec = ListeDegreDecroissant();
-				
 				int couleurCourante = 0;
 
 				while (listeSommetsDec.Count != 0)
@@ -333,7 +331,8 @@ namespace Association
 					{
 						if (!voisins.Contains(sommet)) /// si le sommet n'est pas adjacent au sommet qu'on traite
 						{
-							coloration.Add(sommet, couleurCourante); /// alors on le colorie avec la couleur courante
+
+                            coloration.Add(sommet, couleurCourante); /// alors on le colorie avec la couleur courante
 
 							voisins.AddRange(sommet.Voisins);
 						}
@@ -353,6 +352,7 @@ namespace Association
 		{
 			Dictionary<Noeud<T>, int> coloration = Coloration();
 			int nbCouleurs = 0;
+
 			foreach (int couleur in coloration.Values)
 			{
 				if (couleur > nbCouleurs) {  nbCouleurs = couleur;}

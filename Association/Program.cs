@@ -18,6 +18,7 @@ namespace Association
 
         public static void Main(string[] args)
         {
+            //AfficherGrapheStationMetroParis();
             MainInterface();
         }
 

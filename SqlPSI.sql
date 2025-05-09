@@ -76,20 +76,3 @@ CREATE TABLE Entreprise(
    PRIMARY KEY(NomEntreprise),
    FOREIGN KEY(IDTiers) REFERENCES Client(IDClient) ON DELETE CASCADE
 );
-
-CREATE TABLE cuisine(
-   IDTiers INT,
-   IDPlat INT,
-   PRIMARY KEY(IDTiers, IDPlat),
-   FOREIGN KEY(IDTiers) REFERENCES Cuisinier(IDCuisinier) ON DELETE CASCADE,
-   FOREIGN KEY(IDPlat) REFERENCES Plat(IDPlat) ON DELETE CASCADE
-);
-
-CREATE TABLE sert(
-   IDTiers INT,
-   IDTiers_1 INT,
-   Note INT,
-   PRIMARY KEY(IDTiers, IDTiers_1),
-   FOREIGN KEY(IDTiers) REFERENCES Client(IDClient) ON DELETE CASCADE,
-   FOREIGN KEY(IDTiers_1) REFERENCES Cuisinier(IDCuisinier) ON DELETE CASCADE
-);

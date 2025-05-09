@@ -10,13 +10,16 @@ namespace Association
         /// Fonctions supplémentaires pour manipuler le graphe des stations Graphe<Station>
         /// Car il demande des méthodes particulières qui ne peuvent pas être traitées pour des types générique
 
-        static public void MetroParis(string s1, string s2)
+        public static void AfficherGrapheStationMetroParis()
         {
             Graphe<Station> metroParis = LireStationMetro("MetroParis.xlsx");
 
             DessinerGrapheStation(metroParis, "metro.png");
+        }
 
-            
+        static public void MetroParis(string s1, string s2)
+        {
+            Graphe<Station> metroParis = LireStationMetro("MetroParis.xlsx");
 
             Station stat1 = TrouverStationParNom(metroParis, s1);
             while (stat1 is null)
@@ -33,13 +36,13 @@ namespace Association
                 stat2 = TrouverStationParNom(metroParis, s2);
             }
             Dijkstra(metroParis, metroParis.IdentifierNoeud(stat1), metroParis.IdentifierNoeud(stat2));
-            //Console.WriteLine("\n\nFloyd Warshall : ");
-            //FloydWarshall(metroParis, metroParis.IdentifierNoeud(stat1), metroParis.IdentifierNoeud(stat2));
-            //Console.WriteLine("\n\nBellman Ford : ");
-            //Bellman_Ford(metroParis, metroParis.IdentifierNoeud(stat1), metroParis.IdentifierNoeud(stat2));
+            /// Console.WriteLine("\n\nFloyd Warshall : ");
+            /// FloydWarshall(metroParis, metroParis.IdentifierNoeud(stat1), metroParis.IdentifierNoeud(stat2));
+            /// Console.WriteLine("\n\nBellman Ford : ");
+            /// Bellman_Ford(metroParis, metroParis.IdentifierNoeud(stat1), metroParis.IdentifierNoeud(stat2));
         }
 
-        public static Station IdentifierStationId(List<Station> stations, int id) // identifier une station à partir de son identifiant
+        public static Station IdentifierStationId(List<Station> stations, int id) /// identifier une station à partir de son identifiant
         {
             Station identifiee;
             foreach (Station station in stations)
@@ -62,26 +65,26 @@ namespace Association
             return null;
         }
 
-        static public Graphe<Station> LireStationMetro(string filename) // extrait du fichier MetroParis toutes les stations de métro de Paris
+        static public Graphe<Station> LireStationMetro(string filename) /// extrait du fichier MetroParis toutes les stations de métro de Paris
         {
-            Graphe<Station> grapheParis = new Graphe<Station>(true); // initialisation du graphe du métro parisien
-            List<Station> stationsParis = new List<Station>(); // liste des stations de paris
+            Graphe<Station> grapheParis = new Graphe<Station>(true); /// initialisation du graphe du métro parisien
+            List<Station> stationsParis = new List<Station>(); /// liste des stations de paris
             Noeud<Station> noeudStation;
 
 
             if (!File.Exists(filename)) { Console.WriteLine("Le fichier n'existe pas"); }
 
             FileInfo fileinfo = new FileInfo(filename);
-            using (ExcelPackage package = new ExcelPackage(fileinfo)) // lecture du fichier xlsx
+            using (ExcelPackage package = new ExcelPackage(fileinfo)) /// lecture du fichier xlsx
             {
-                ExcelWorksheet worksheet1 = package.Workbook.Worksheets[0]; // lecture de la première feuille excel -> stations de métro (noeuds)
-                ExcelWorksheet worksheet2 = package.Workbook.Worksheets[1]; // lecture de la première feuille excel -> lien entre les stations (arcs)
+                ExcelWorksheet worksheet1 = package.Workbook.Worksheets[0]; /// lecture de la première feuille excel -> stations de métro (noeuds)
+                ExcelWorksheet worksheet2 = package.Workbook.Worksheets[1]; /// lecture de la première feuille excel -> lien entre les stations (arcs)
 
-                // lecture des données de la feuille
-                int rowCount1 = worksheet1.Dimension.Rows; // nombre de lignes = nombre de stations
+                /// lecture des données de la feuille
+                int rowCount1 = worksheet1.Dimension.Rows; /// nombre de lignes = nombre de stations
                 int rowCount2 = worksheet2.Dimension.Rows;
 
-                // on connait la forme du fichier Excel du métro parisien
+                /// on connait la forme du fichier Excel du métro parisien
                 for (int row = 2; row <= rowCount1; row++)
                 {
                     Station s = new Station(int.Parse(worksheet1.Cells[row, 1].Text),
@@ -90,9 +93,9 @@ namespace Association
                         double.Parse(worksheet1.Cells[row, 4].Text, CultureInfo.InvariantCulture),
                         double.Parse(worksheet1.Cells[row, 5].Text, CultureInfo.InvariantCulture),
                         worksheet1.Cells[row, 6].Text);
-                    noeudStation = new Noeud<Station>(s); // "conversion" de la station traitée en noeud
-                    stationsParis.Add(s); // ajout de la station à la liste des stations de Paris
-                    grapheParis.AjouterSommet(noeudStation); // on ajoute la station au plan du métro parisien
+                    noeudStation = new Noeud<Station>(s); /// "conversion" de la station traitée en noeud
+                    stationsParis.Add(s); /// ajout de la station à la liste des stations de Paris
+                    grapheParis.AjouterSommet(noeudStation); /// on ajoute la station au plan du métro parisien
                 }
 
                 for (int row = 2; row <= rowCount2; row++)
@@ -149,7 +152,7 @@ namespace Association
             const int hauteurImage = 1100;
             const int marge = 50;
 
-            // Calcul des limites pour la normalisation
+            /// Calcul des limites pour la normalisation
             double minLongitude = double.MaxValue, maxLongitude = double.MinValue;
             double minLatitude = double.MaxValue, maxLatitude = double.MinValue;
 
@@ -164,7 +167,7 @@ namespace Association
                 }
             }
 
-            // Création du bitmap pour l'image
+            /// Création du bitmap pour l'image
             using (var bitmap = new SKBitmap(largeurImage, hauteurImage))
             using (var canvas = new SKCanvas(bitmap))
             {
@@ -176,19 +179,19 @@ namespace Association
 
                 Dictionary<Noeud<Station>, SKPoint> positions = new Dictionary<Noeud<Station>, SKPoint>();
 
-                // Positionner les stations en fonction de leur longitude et latitude
+                /// Positionner les stations en fonction de leur longitude et latitude
                 foreach (Noeud<Station> noeud in graphe.Noeuds)
                 {
                     if (noeud.Nom is Station station)
                     {
                         float x = (float)((station.Longitude - minLongitude) / (maxLongitude - minLongitude) * (largeurImage - 2 * marge)) + marge;
                         float y = (float)((station.Latitude - minLatitude) / (maxLatitude - minLatitude) * (hauteurImage - 2 * marge)) + marge;
-                        y = hauteurImage - y; // Inverser pour correspondre aux coordonnées graphiques
+                        y = hauteurImage - y; /// Inverser pour correspondre aux coordonnées graphiques
                         positions[noeud] = new SKPoint(x, y);
                     }
                 }
 
-                // Dessiner les liens
+                /// Dessiner les liens
                 foreach (Lien<Station> lien in graphe.Liens)
                 {
                     if (positions.ContainsKey(lien.Noeud1) && positions.ContainsKey(lien.Noeud2))
@@ -199,7 +202,7 @@ namespace Association
                     }
                 }
 
-                // Dessiner les sommets
+                /// Dessiner les sommets
                 foreach (var entry in positions)
                 {
                     SKPoint position = entry.Value;
@@ -218,7 +221,7 @@ namespace Association
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = cheminImage,
-                    UseShellExecute = true  // Permet d'utiliser l'application par défaut pour ouvrir l'image
+                    UseShellExecute = true  /// Permet d'utiliser l'application par défaut pour ouvrir l'image
                 });
             }
         }

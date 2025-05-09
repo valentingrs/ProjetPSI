@@ -40,10 +40,10 @@ namespace Association
 				List<object> data = GetTable(conn, tableName);
 
 				/// Sérialisation des données en XML
-				serialize_XML(data);
+				serialize_XML(data, tableName);
 
 				/// Sérialisation des données en JSON
-				serialize_JSON(data);
+				serialize_JSON(data, tableName);
 			}
 			catch (Exception ex)
 			{
@@ -55,43 +55,39 @@ namespace Association
 		{
 			List<object> resultat = new List<object>();
 
-			using (conn)
-			{
-				conn.Open();
+            /// Exécution de la requête SQL pour récupérer toutes les données d'une table
+            MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {nomTable}", conn);
+            var reader = cmd.ExecuteReader();
 
-				/// Exécution de la requête SQL pour récupérer toutes les données d'une table
-				MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {nomTable}", conn);
-				var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                var colonne = new Dictionary<string, object>();
 
-				while (reader.Read())
-				{
-					var colonne = new Dictionary<string, object>();
+                for (int i = 0; i < reader.FieldCount; i++)
+                {
+                    colonne[reader.GetName(i)] = reader.GetValue(i);  /// Dynamique : Ajoute le nom de la colonne et sa valeur
+                }
 
-					for (int i = 0; i < reader.FieldCount; i++)
-					{
-						colonne[reader.GetName(i)] = reader.GetValue(i);  /// Dynamique : Ajoute le nom de la colonne et sa valeur
-					}
-
-					resultat.Add(colonne);  /// Ajouter la ligne au résultat
-				}
-			}
+                resultat.Add(colonne);  /// Ajouter la ligne au résultat
+            }
+            reader.Close();
 
 			return resultat;
 		}
 
 		/// Sérialisation des données en XML (adaptée pour les dictionnaires)
-		public static void serialize_XML(List<object> list)
+		public static void serialize_XML(List<object> list, string table)
 		{
             var serializableList = ConvertToSerializable(list);
 
             /// Sérialisation de la liste des données en XML
             XmlSerializer serializer = new XmlSerializer(typeof(List<Ligne>));  /// Modifier le type de sérialisation
-			using (var stream = new FileStream("commandes.xml", FileMode.Create))
+			using (var stream = new FileStream($"{table}.xml", FileMode.Create))
 			{
 				serializer.Serialize(stream, serializableList);
 			}
 
-			Console.WriteLine("Fichier XML généré avec succès.");
+			Console.WriteLine("Fichier XML généré avec succès dans le dossier Debug.");
 		}
 
         private static List<Ligne> ConvertToSerializable(List<object> data)
@@ -120,15 +116,15 @@ namespace Association
 
 
         /// Sérialisation des données en JSON
-        public static void serialize_JSON(List<object> list)
+        public static void serialize_JSON(List<object> list, string table)
 		{
 			/// Sérialisation des données en JSON
 			string json = JsonSerializer.Serialize(list, new JsonSerializerOptions { WriteIndented = true });
 
 			/// Sauvegarde dans un fichier JSON
-			File.WriteAllText("commandes.json", json);
+			File.WriteAllText($"{table}.json", json);
 
-			Console.WriteLine("Fichier JSON généré avec succès.");
+			Console.WriteLine("Fichier JSON généré avec succès dans le dossier Debug.");
 		}
 	}
 }
