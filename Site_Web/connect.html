@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Interface SQL - LivinParis</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; padding: 20px; }
+    h1 { color: #333; }
+    textarea { width: 100%; height: 150px; font-family: monospace; font-size: 14px; padding: 10px; }
+    button { padding: 10px 20px; margin-top: 10px; font-size: 16px; background: #007bff; color: white; border: none; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    pre { background: #272822; color: #f8f8f2; padding: 10px; overflow-x: auto; }
+    .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Console SQL - Base LivinParis</h1>
+    <textarea id="query" placeholder="Écris ta requête SQL ici..."></textarea>
+    <button onclick="runQuery()">Exécuter</button>
+    <pre id="result">Résultat...</pre>
+  </div>
+
+  <script>
+    function runQuery() {
+      const query = document.getElementById('query').value;
+      fetch('http://localhost:3000/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const resultArea = document.getElementById('result');
+        if (data.error) {
+          resultArea.textContent = '❌ ' + data.error;
+        } else {
+          resultArea.textContent = JSON.stringify(data, null, 2);
+        }
+      })
+      .catch(err => {
+        document.getElementById('result').textContent = '⚠️ Erreur réseau : ' + err.message;
+      });
+    }
+  </script>
+</body>
+</html>

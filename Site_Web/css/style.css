@@ -1,0 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=BhuTuka+Expanded+One&family=Splash&display=swap');
+
+/* || RESET */
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing:border-box
+}
+
+/* || VARIABLES */
+:root {
+  /* COLORS */
+  --BG-PRIMARY-COLOR: #0B0F1A;
+  --BG-SECONDARY-COLOR: #1A2B96; 
+  --TITLE-FONT-COLOR: #FF6B00;
+  --GENERAL-FONT-COLOR: #EAEAEA;
+
+  /* FONTS */
+  --TITLE-FF: "Splash", sans-serif;
+  --TITLE-FS: 15rem;
+  --CATCH-PHRASE-FS: 2rem;
+  --SECONDARY-FF: "BhuTuka Expanded One", sans-serif;
+  --SECONDARY--FS: clamp(2em, 96px, 10rem);
+  --BASIC-FF: "Arial", sans-serif;
+  --BASIC-FS: 3rem;
+}
+
+/* || UTILITY CLASSES */
+.offscreen {
+  position: absolute;
+  left: -10000px;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.center {
+  text-align: center;
+}
+
+.highlight {
+  color: var(--TITLE-FONT-COLOR);
+  font-weight: bolder;
+}
+
+/* || GENERAL STYLES */
+html {
+  scroll-behavior: smooth;
+  background-image: linear-gradient(to bottom right, var(--BG-PRIMARY-COLOR), var(--BG-SECONDARY-COLOR));
+  background-blend-mode: overlay;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+}
+
+header{
+    position: relative;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+footer {
+  margin-top: 6rem;
+}
+
+p {
+  font-family: var(--SECONDARY-FF);
+  color: var(--GENERAL-FONT-COLOR);
+  font-size: var(--BASIC-FS);
+  letter-spacing: 0.5;
+  line-height: 1.2;
+  padding: 3rem;
+  justify-content: space-between;
+}
+
+a:hover,
+a:active {
+  color: var(--TITLE-FONT-COLOR);
+  font-weight: bolder;
+}
+
+.BG {
+  animation: BackgroundMovement 15s ease infinite;
+  background: linear-gradient(270deg, var(--BG-PRIMARY-COLOR), var(--BG-SECONDARY-COLOR));
+  background-size: 400% 400%;
+}
+
+.header__h1{
+  position: absolute;
+  left: 9.9vw;
+  top: 19.9vh;
+
+  font-family: var(--TITLE-FF);
+  color: var(--TITLE-FONT-COLOR);
+  font-size: var(--TITLE-FS);
+  font-weight: normal;
+  text-decoration: none;
+
+  animation: TitleAnimation 5s ease-in-out forwards;
+}
+
+.header__h2 {
+  position: absolute;
+  left: 60vw;
+  top: 60vh;
+
+  font-family: var(--SECONDARY-FF);
+  color: var(--GENERAL-FONT-COLOR);
+  font-size: var(--CATCH-PHRASE-FS);
+  font-weight: normal;
+}
+
+.article__h2 {
+  font-family: var(--SECONDARY-FF);
+  color: var(--GENERAL-FONT-COLOR);
+  font-size: var(--SECONDARY--FS);
+  font-weight: normal;
+
+  margin-bottom: 10rem;
+}
+
+.article__h3 {
+  font-family: var(--SECONDARY-FF);
+  color: var(--GENERAL-FONT-COLOR);
+  font-size: clamp(1.5em, 72px, 7.5rem);
+  font-weight: normal;
+
+  margin-bottom: 5rem;
+}
+
+.article__h4{
+  font-family: var(--SECONDARY-FF);
+  color: var(--GENERAL-FONT-COLOR);
+  font-size: var(--BASIC-FS);
+  letter-spacing: 0.5;
+  line-height: 1.2;
+  padding: 3rem;
+  justify-content: space-between;
+}
+
+.article__ul{
+  font-family: var(--SECONDARY-FF);
+  color: var(--GENERAL-FONT-COLOR);
+  font-size: var(--BASIC-FS);
+  letter-spacing: 0.5;
+  line-height: 1.2;
+  padding: 3rem;
+  justify-content: space-between;
+}
+
+.main__article__1 {
+  padding: 10rem;
+  width: 100%;
+}
+
+.main__transition {
+  padding: 20rem;
+  background-image: linear-gradient(to bottom, var(--BG-PRIMARY-COLOR), #b00a2b);
+}
+
+.main__article__2 {
+  padding: 10rem;
+
+  width: 100%;
+
+  background-image: linear-gradient(to bottom right, #b00a2b, #FF4500);
+}
+
+/* || ANIMATIONS */
+@keyframes TitleAnimation {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+    filter: blur(6px);
+  }
+
+  /* Phase 1 - Apparition progressive */
+  15% {
+    opacity: 1;
+    transform: scale(1.05) translateY(0);
+    filter: blur(4px);
+  }
+
+  /* Phase 2 - Expansion légère et naturelle */
+  30% {
+    transform: scale(1.1) translateY(-5px);
+    filter: blur(2px);
+  }
+
+  /* Phase 3 - Stabilisation élégante */
+  50% {
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes BackgroundMovement {
+  0% {
+    background: linear-gradient(270deg, var(--BG-PRIMARY-COLOR), var(--BG-SECONDARY-COLOR));
+    background-size: 400% 400%;
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
