@@ -461,7 +461,6 @@ namespace Association
                     while (reader.Read())
                     {
                         int id = reader.GetInt32("IDCuisinier");
-                        Console.WriteLine(id);
                         if (id == idCuisinier)
                             return true;
                     }
@@ -813,11 +812,12 @@ namespace Association
 
         public static void NatioPlats(MySqlConnection conn, string nationalite, int idClient)
         {
-            string query = "SELECT p.NomPlat AS Nom, p.Regime, p.Ingredients, p.PrixPlat as Prix FROM Plat p " +
-                           "JOIN PlatCommande pc ON p.IDPlat = pc.IDPlat " +
+            string query = "SELECT pl.NomPlat AS Nom, pl.Regime, pl.Ingredients, pcui.PrixPlat as Prix FROM PlatCommande pc " +
+                           "JOIN PlatCuisinier pcui ON pc.IDPlatCuisinier = pcui.IDPlatCuisinier " +           
+                           "JOIN Plat pl ON pcui.IDPlat = pl.IDPlat " +
                            "JOIN Commande c ON pc.IDCommande = c.IDCommande " +
                           $"WHERE c.IDClient = {idClient} " +
-                          $"AND p.Nationalite = '{nationalite}';";
+                          $"AND pl.Nationalite = '{nationalite}';";
 
             MySqlCommand cmd = new MySqlCommand(query, conn);
             MySqlDataReader reader = cmd.ExecuteReader();

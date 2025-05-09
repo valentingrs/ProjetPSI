@@ -6,6 +6,7 @@ using System.ComponentModel;
 using static Association.PlusCourtChemin;
 using static Association.Association;
 using static Association.GrapheTiers;
+using static Association.XmlJson;
 
 
 namespace Association
@@ -17,9 +18,6 @@ namespace Association
 
         public static void Main(string[] args)
         {
-            //TestColoration();
-
-            //TestAlgoGraphes();
             MainInterface();
         }
 
